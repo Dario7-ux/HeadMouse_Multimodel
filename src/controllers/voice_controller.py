@@ -17,10 +17,13 @@ except ImportError:
     Model = None
     KaldiRecognizer = None
 
+from src.utils.resource_helper import get_resource_path
+
 logger = logging.getLogger("VoiceController")
 
 # Ruta del modelo de Vosk
-VOSK_MODEL_PATH = os.path.join(os.path.dirname(__file__), "../../assets/models/vosk-model-es-0.42")
+VOSK_MODEL_PATH = get_resource_path("assets/models/vosk-model-es-0.42")
+
 
 
 # pyrefly: ignore [invalid-inheritance]

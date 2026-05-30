@@ -11,11 +11,14 @@ try:
 except ImportError:
     requests = None
 
+from src.utils.resource_helper import get_resource_path
+
 logger = logging.getLogger("VoskSetup")
 
 VOSK_MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-es-0.42.zip"
-VOSK_MODEL_DIR = "assets/models"
+VOSK_MODEL_DIR = get_resource_path("assets/models")
 VOSK_MODEL_NAME = "vosk-model-es-0.42"
+
 
 
 def get_model_path() -> str:
