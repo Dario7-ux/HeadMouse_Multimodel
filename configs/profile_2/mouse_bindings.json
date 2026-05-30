@@ -1,0 +1,38 @@
+{
+    "Mouth left": [
+        "mouse", 
+        "reset", 
+        0.1783, 
+        "single"
+    ], 
+    "Mouth right": [
+        "mouse", 
+        "middle", 
+        0.23769999999999997, 
+        "single"
+    ], 
+    "Open mouth": [
+        "mouse", 
+        "pause", 
+        0.16840000000000002, 
+        "single"
+    ], 
+    "Raise left eyebrow": [
+        "mouse", 
+        "left", 
+        0.09909999999999997, 
+        "single"
+    ], 
+    "Raise right eyebrow": [
+        "mouse", 
+        "right", 
+        0.14859999999999998, 
+        "single"
+    ], 
+    "Roll lower mouth": [
+        "mouse", 
+        "cycle", 
+        0.21790000000000007, 
+        "single"
+    ]
+}

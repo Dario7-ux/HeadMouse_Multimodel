@@ -1,0 +1,246 @@
+2026-05-30 12:44:03,607 INFO root: <module>: Successfully monkeypatched PIL.Image.open
+2026-05-30 12:44:03,906 INFO root: <module>: Successfully monkeypatched cv2.imread
+2026-05-30 12:44:05,788 INFO root: <module>: Starting main app.
+2026-05-30 12:44:05,797 INFO TaskKiller: __init__: Intialize TaskKiller singleton
+2026-05-30 12:44:05,799 INFO root: start: Installing google fonts.
+2026-05-30 12:44:05,800 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Bold.ttf
+2026-05-30 12:44:05,801 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Medium.ttf
+2026-05-30 12:44:05,801 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Regular.ttf
+2026-05-30 12:44:05,802 INFO ConfigManager: __init__: Intialize ConfigManager singleton
+2026-05-30 12:44:05,803 INFO DatabaseManager: _init_db: Initializing SQLite database at configs\focuzvoz.db
+2026-05-30 12:44:05,809 INFO ConfigManager: _migrate_to_sqlite: Flesystem profiles: ['default', 'profile_1', 'profile_2']. DB profiles: ['default', 'profile_1', 'profile_2']
+2026-05-30 12:44:05,809 INFO ConfigManager: _migrate_to_sqlite: Automatic SQLite database migration check completed.
+2026-05-30 12:44:05,811 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-05-30 12:44:05,811 INFO ConfigManager: start: Start ConfigManager singleton
+2026-05-30 12:44:05,812 INFO ConfigManager: load_profile: Loading profile from SQLite: default
+2026-05-30 12:44:05,815 INFO CameraManager: __init__: Intialize CameraManager singleton
+2026-05-30 12:44:05,840 INFO CameraManager: start: Start CameraManager singleton
+2026-05-30 12:44:05,841 INFO CameraManager: __init__: Intializing Threadcamera
+2026-05-30 12:44:05,844 INFO ListCamera: __open_camera_task: Try openning camera: 0
+2026-05-30 12:44:05,844 INFO CameraManager: __init__: Found default camera_id None
+2026-05-30 12:44:05,845 INFO CameraManager: read_camera_loop: Threadcamera main_loop started.
+2026-05-30 12:44:05,845 INFO MouseController: __init__: Intialize MouseController singleton
+2026-05-30 12:44:05,846 INFO MouseController: start: Start MouseController singleton
+2026-05-30 12:44:05,846 INFO OneEuroFilter: __init__: OneEuroFilter2D initialized: min_cutoff=2.5, beta=0.015, d_cutoff=1.0
+2026-05-30 12:44:05,846 INFO MouseController: start: 1 Euro Filter initialized for cursor smoothing
+2026-05-30 12:44:05,847 INFO Keybinder: __init__: Intialize Keybinder singleton
+2026-05-30 12:44:05,847 INFO Keybinder: start: Start Keybinder singleton
+2026-05-30 12:44:05,847 INFO FaceMesh: __init__: Intialize FaceMesh singleton
+2026-05-30 12:44:05,848 INFO FaceMesh: start: Start FaceMesh singleton
+2026-05-30 12:44:05,907 INFO VoiceController: __init__: Initialize VoiceController singleton
+2026-05-30 12:44:05,907 INFO VoiceController: start: Start VoiceController singleton
+2026-05-30 12:44:06,045 INFO comtypes.client._code_cache: _create_comtypes_gen_package: Imported existing <module 'comtypes.gen' from 'C:\\Servidores\\Lectura_FocuzVoz\\FocuzVoz2.1\\.venv\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-05-30 12:44:06,046 INFO comtypes.client._code_cache: _find_gen_dir: Using writeable comtypes cache directory: 'C:\Servidores\Lectura_FocuzVoz\FocuzVoz2.1\.venv\Lib\site-packages\comtypes\gen'
+2026-05-30 12:44:07,056 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 000001CAA273FDB0> height: 480 width: 640
+2026-05-30 12:44:07,317 INFO ListCamera: __open_camera_task: Try openning camera: 1
+2026-05-30 12:44:07,589 INFO ListCamera: __open_camera_task: Camera 1: < cv2.VideoCapture 000001CAA57A3450> height: 480 width: 640
+2026-05-30 12:44:07,620 INFO ListCamera: __open_camera_task: Try openning camera: 2
+2026-05-30 12:44:07,623 WARNING ListCamera: __open_camera_task: Camera 2: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+
+2026-05-30 12:44:07,623 INFO ListCamera: assign_caps_queue: Camera 2: Failed to open
+2026-05-30 12:44:07,624 INFO ListCamera: __open_camera_task: Try openning camera: 3
+2026-05-30 12:44:07,625 WARNING ListCamera: __open_camera_task: Camera 3: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+
+2026-05-30 12:44:07,626 INFO ListCamera: assign_caps_queue: Camera 3: Failed to open
+2026-05-30 12:44:07,626 INFO ListCamera: __open_camera_task: Try openning camera: 4
+2026-05-30 12:44:07,628 WARNING ListCamera: __open_camera_task: Camera 4: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+
+2026-05-30 12:44:07,628 INFO ListCamera: assign_caps_queue: Camera 4: Failed to open
+2026-05-30 12:44:07,628 INFO CameraManager: assign_done: Assign cameras completed. Found {0: None, 1: None}
+2026-05-30 12:44:07,628 INFO CameraManager: assign_done: Try to use camera 0
+2026-05-30 12:44:07,628 INFO CameraManager: pick_camera: Pick camera 0, Releasing others...
+2026-05-30 12:44:07,630 INFO ListCamera: __open_camera_task: Try openning camera: 0
+2026-05-30 12:44:08,228 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 000001CAB77F0F70> height: 480 width: 640
+2026-05-30 12:44:11,551 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 121.68
+2026-05-30 12:44:14,861 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 128.49
+2026-05-30 12:44:18,190 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 122.83
+2026-05-30 12:44:21,517 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 122.13
+2026-05-30 12:44:24,846 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 124.29
+2026-05-30 12:44:28,173 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 121.40
+2026-05-30 12:44:31,502 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 118.14
+2026-05-30 12:44:34,813 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 121.33
+2026-05-30 12:44:38,140 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 119.37
+2026-05-30 12:44:41,468 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 125.50
+2026-05-30 12:44:44,800 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 121.68
+2026-05-30 12:44:48,125 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 123.06
+2026-05-30 12:44:51,454 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 124.98
+2026-05-30 12:44:53,726 INFO VoiceController: _initialize_vosk_model: Modelo de Vosk cargado correctamente (modo fuera de línea - no requiere internet)
+2026-05-30 12:44:53,728 INFO VoiceController: _start_listening_thread: Hilo de fondo para reconocimiento de voz de Vosk lanzado con éxito.
+2026-05-30 12:44:53,729 INFO MainGUi: __init__: Init MainGui
+2026-05-30 12:44:53,729 INFO Pipeline: __init__: Init Pipeline
+2026-05-30 12:44:54,177 INFO VoiceController: _listen_loop: El reconocedor de Vosk está escuchando... (modo fuera de línea)
+2026-05-30 12:44:54,785 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 128.10
+2026-05-30 12:44:54,816 INFO frame_preview: enter: enter
+2026-05-30 12:44:54,818 INFO PageHome: __init__: Create PageHome with Research telemetry and Accessibility guidance
+2026-05-30 12:44:56,209 INFO PageVoice: __init__: Create PageVoice
+2026-05-30 12:44:56,282 INFO VoiceController: update_config: VoiceController config updated: {'enabled': True, 'language': 'es-ES', 'microphone_id': 0, 'confidence_threshold': 0.29999999999999993, 'voice_sensitivity': 41, 'auto_type': False, 'confirmation_required': False, 'pause_during_cursor': True, 'speech_timeout_ms': 5000, 'voice_feedback': True}
+2026-05-30 12:44:56,289 INFO PageVoice: load_initial_config: Voice config loaded successfully
+2026-05-30 12:44:56,291 INFO page_home: enter: enter
+2026-05-30 12:44:56,291 INFO page_camera: leave: leave
+2026-05-30 12:44:56,291 INFO page_cursor: leave: leave
+2026-05-30 12:44:56,293 INFO page_gestures: leave: leave
+2026-05-30 12:44:56,293 INFO FrameSelectGesture: leave: leave
+2026-05-30 12:44:56,293 INFO page_keyboard: leave: leave
+2026-05-30 12:44:56,294 INFO FrameSelectKeyboard: leave: leave
+2026-05-30 12:44:56,294 INFO PageVoice: leave: leave
+2026-05-30 12:44:56,362 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-05-30 12:44:56,366 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-05-30 12:44:56,386 INFO FrameProfileSwitcher: hide_window: hide
+2026-05-30 12:44:56,513 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-05-30 12:44:56,529 INFO FrameProfileEditor: hide_window: hide
+2026-05-30 12:44:56,556 INFO Pipeline: __init__: Init Pipeline
+2026-05-30 12:44:56,557 INFO Pipeline: start: Starting Pipeline background thread...
+2026-05-30 12:44:56,788 INFO FacialEventManager: __init__: Initializing FacialEventManager singleton
+2026-05-30 12:44:56,802 WARNING DatabaseManager: add_profile: Profile 'default' already exists.
+2026-05-30 12:44:56,804 INFO ConfigManager: update_voice_config: Voice config backup updated: {'auto_type': False}
+2026-05-30 12:44:56,804 INFO VoiceController: update_config: VoiceController config updated: {'enabled': True, 'language': 'es-ES', 'microphone_id': 0, 'confidence_threshold': 0.29999999999999993, 'voice_sensitivity': 41, 'auto_type': False, 'confirmation_required': False, 'pause_during_cursor': True, 'speech_timeout_ms': 5000, 'voice_feedback': True}
+2026-05-30 12:44:56,805 INFO MainGUi: root_function_callback: root_function_callback refresh_voice_write with {}
+2026-05-30 12:44:56,812 INFO DatabaseManager: start_research_session: Started research session 4db41cc6-c215-4397-942d-83a71e19cc5b for subject Participante_20260530_124456 
+2026-05-30 12:44:56,838 INFO PageHome: toggle_recording: Research logging session started for Participante_20260530_124456
+2026-05-30 12:44:57,198 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Raise left eyebrow' (Hold time: 170.0ms)
+2026-05-30 12:44:58,092 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 133.52
+2026-05-30 12:44:58,559 INFO MouseController: main_loop: [DIAG] loop=200 raw=(302.3,288.3) vel=(0.11,-0.12)
+2026-05-30 12:45:00,276 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 169.8ms)
+2026-05-30 12:45:00,276 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:00,364 INFO VoiceController: _listen_loop: El micrófono escuchó: 'gamboa'
+2026-05-30 12:45:01,420 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 120.31
+2026-05-30 12:45:04,526 INFO VoiceController: _listen_loop: El micrófono escuchó: 'abrir navegador'
+2026-05-30 12:45:04,644 INFO VoiceController: speak_confirmation: [VOICE FEEDBACK] Encolando confirmación de voz: Abriendo navegador
+2026-05-30 12:45:04,750 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 118.72
+2026-05-30 12:45:07,575 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 169.7ms)
+2026-05-30 12:45:07,576 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:07,622 INFO MouseController: main_loop: [DIAG] loop=400 raw=(287.5,241.4) vel=(0.37,0.07)
+2026-05-30 12:45:08,079 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.19
+2026-05-30 12:45:09,358 INFO MouseController: main_loop: [DIAG] loop=600 raw=(292.6,280.1) vel=(-0.20,10.74)
+2026-05-30 12:45:11,078 INFO MouseController: main_loop: [DIAG] loop=800 raw=(312.9,273.6) vel=(1.67,0.06)
+2026-05-30 12:45:11,405 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.48
+2026-05-30 12:45:12,530 INFO VoiceController: _listen_loop: El micrófono escuchó: 'porque tengo que ir a abrir worth'
+2026-05-30 12:45:12,802 INFO MouseController: main_loop: [DIAG] loop=1000 raw=(293.4,261.2) vel=(-0.02,0.03)
+2026-05-30 12:45:14,500 INFO MouseController: main_loop: [DIAG] loop=1200 raw=(313.2,271.8) vel=(-0.23,-0.01)
+2026-05-30 12:45:14,734 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 126.54
+2026-05-30 12:45:16,203 INFO MouseController: main_loop: [DIAG] loop=1400 raw=(302.0,246.3) vel=(-4.14,-29.25)
+2026-05-30 12:45:16,356 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 173.8ms)
+2026-05-30 12:45:16,358 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:17,410 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 171.2ms)
+2026-05-30 12:45:17,410 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:18,046 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 126.57
+2026-05-30 12:45:18,981 INFO MouseController: main_loop: [DIAG] loop=1600 raw=(295.3,280.6) vel=(-0.16,0.16)
+2026-05-30 12:45:20,447 INFO VoiceController: _listen_loop: El micrófono escuchó: 'sin abrir bloc de notas'
+2026-05-30 12:45:20,682 INFO MouseController: main_loop: [DIAG] loop=1800 raw=(293.4,282.0) vel=(0.00,0.05)
+2026-05-30 12:45:21,373 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.01
+2026-05-30 12:45:22,367 INFO MouseController: main_loop: [DIAG] loop=2000 raw=(294.2,283.1) vel=(0.01,0.05)
+2026-05-30 12:45:24,061 INFO MouseController: main_loop: [DIAG] loop=2200 raw=(293.4,284.8) vel=(-0.09,0.00)
+2026-05-30 12:45:24,703 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 125.26
+2026-05-30 12:45:25,801 INFO MouseController: main_loop: [DIAG] loop=2400 raw=(280.3,306.2) vel=(0.05,-0.39)
+2026-05-30 12:45:27,591 INFO MouseController: main_loop: [DIAG] loop=2600 raw=(297.3,291.9) vel=(-0.16,-2.64)
+2026-05-30 12:45:28,036 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 121.63
+2026-05-30 12:45:28,866 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 171.8ms)
+2026-05-30 12:45:28,873 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:29,917 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 168.9ms)
+2026-05-30 12:45:29,918 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:30,426 INFO MouseController: main_loop: [DIAG] loop=2800 raw=(296.6,285.4) vel=(0.05,15.01)
+2026-05-30 12:45:31,358 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 124.23
+2026-05-30 12:45:32,042 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 177.4ms)
+2026-05-30 12:45:32,044 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:32,234 INFO VoiceController: _listen_loop: El micrófono escuchó: 'abrir word'
+2026-05-30 12:45:32,353 INFO VoiceController: speak_confirmation: [VOICE FEEDBACK] Encolando confirmación de voz: Abriendo Word
+2026-05-30 12:45:32,990 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 169.7ms)
+2026-05-30 12:45:32,993 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:33,165 INFO MouseController: main_loop: [DIAG] loop=3000 raw=(300.0,286.0) vel=(-0.96,0.85)
+2026-05-30 12:45:34,686 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 126.84
+2026-05-30 12:45:34,940 INFO MouseController: main_loop: [DIAG] loop=3200 raw=(295.7,305.8) vel=(0.08,0.06)
+2026-05-30 12:45:36,669 INFO MouseController: main_loop: [DIAG] loop=3400 raw=(298.3,305.8) vel=(0.02,0.27)
+2026-05-30 12:45:38,002 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 125.23
+2026-05-30 12:45:38,397 INFO MouseController: main_loop: [DIAG] loop=3600 raw=(304.7,309.1) vel=(-0.32,0.16)
+2026-05-30 12:45:38,951 INFO VoiceController: _listen_loop: El micrófono escuchó: 'abbott'
+2026-05-30 12:45:40,136 INFO MouseController: main_loop: [DIAG] loop=3800 raw=(304.3,310.7) vel=(-0.00,-0.26)
+2026-05-30 12:45:41,328 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 129.74
+2026-05-30 12:45:41,864 INFO MouseController: main_loop: [DIAG] loop=4000 raw=(303.0,309.9) vel=(0.01,-0.04)
+2026-05-30 12:45:43,605 INFO MouseController: main_loop: [DIAG] loop=4200 raw=(303.9,311.9) vel=(-1.28,0.00)
+2026-05-30 12:45:43,749 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Raise left eyebrow' (Hold time: 169.0ms)
+2026-05-30 12:45:44,265 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 177.0ms)
+2026-05-30 12:45:44,269 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:44,654 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 139.57
+2026-05-30 12:45:44,903 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 167.5ms)
+2026-05-30 12:45:44,912 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:45,504 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 169.4ms)
+2026-05-30 12:45:45,505 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:47,981 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 122.43
+2026-05-30 12:45:48,168 INFO VoiceController: _listen_loop: El micrófono escuchó: 'a ver abrir word'
+2026-05-30 12:45:51,313 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 116.92
+2026-05-30 12:45:54,638 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 125.04
+2026-05-30 12:45:56,213 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 170.1ms)
+2026-05-30 12:45:56,213 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:56,740 INFO MouseController: main_loop: [DIAG] loop=4400 raw=(296.9,254.5) vel=(-0.13,0.25)
+2026-05-30 12:45:57,568 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 168.4ms)
+2026-05-30 12:45:57,571 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:57,966 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.91
+2026-05-30 12:45:58,212 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 170.6ms)
+2026-05-30 12:45:58,212 INFO root: toggle_active: Toggle active
+2026-05-30 12:45:59,167 INFO MouseController: main_loop: [DIAG] loop=4600 raw=(285.3,271.5) vel=(-0.02,0.66)
+2026-05-30 12:46:00,552 INFO VoiceController: _listen_loop: El micrófono escuchó: 'abrir word'
+2026-05-30 12:46:00,618 INFO VoiceController: speak_confirmation: [VOICE FEEDBACK] Encolando confirmación de voz: Abriendo Word
+2026-05-30 12:46:00,913 INFO MouseController: main_loop: [DIAG] loop=4800 raw=(287.4,275.4) vel=(0.01,0.02)
+2026-05-30 12:46:01,278 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 126.30
+2026-05-30 12:46:02,622 INFO MouseController: main_loop: [DIAG] loop=5000 raw=(289.2,283.6) vel=(-0.02,-1.43)
+2026-05-30 12:46:03,567 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 168.0ms)
+2026-05-30 12:46:03,567 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:04,605 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 120.89
+2026-05-30 12:46:04,754 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 175.6ms)
+2026-05-30 12:46:04,755 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:05,632 INFO MouseController: main_loop: [DIAG] loop=5200 raw=(287.0,280.9) vel=(0.07,4.45)
+2026-05-30 12:46:07,387 INFO MouseController: main_loop: [DIAG] loop=5400 raw=(286.8,285.5) vel=(0.10,0.03)
+2026-05-30 12:46:07,782 INFO VoiceController: _listen_loop: El micrófono escuchó: 'f abrir bloc de notas'
+2026-05-30 12:46:07,941 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 121.40
+2026-05-30 12:46:09,142 INFO MouseController: main_loop: [DIAG] loop=5600 raw=(286.5,288.7) vel=(0.04,-0.05)
+2026-05-30 12:46:10,299 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 167.7ms)
+2026-05-30 12:46:10,300 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:11,260 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 122.69
+2026-05-30 12:46:14,587 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 120.98
+2026-05-30 12:46:15,108 INFO VoiceController: _listen_loop: El micrófono escuchó: 'abrir navegador'
+2026-05-30 12:46:15,146 INFO VoiceController: speak_confirmation: [VOICE FEEDBACK] Encolando confirmación de voz: Abriendo navegador
+2026-05-30 12:46:17,918 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.69
+2026-05-30 12:46:18,169 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 170.8ms)
+2026-05-30 12:46:18,169 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:18,834 INFO MouseController: main_loop: [DIAG] loop=5800 raw=(289.0,234.4) vel=(-0.21,7.99)
+2026-05-30 12:46:19,085 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 168.5ms)
+2026-05-30 12:46:19,085 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:19,795 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 170.1ms)
+2026-05-30 12:46:19,795 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:20,471 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 168.7ms)
+2026-05-30 12:46:20,471 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:21,231 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 126.61
+2026-05-30 12:46:23,028 INFO VoiceController: _listen_loop: El micrófono escuchó: 'abrir bloc de notas'
+2026-05-30 12:46:23,110 INFO VoiceController: speak_confirmation: [VOICE FEEDBACK] Encolando confirmación de voz: Abriendo bloc de notas
+2026-05-30 12:46:23,684 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 170.6ms)
+2026-05-30 12:46:23,686 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:24,122 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Open mouth' (Hold time: 169.0ms)
+2026-05-30 12:46:24,126 INFO root: toggle_active: Toggle active
+2026-05-30 12:46:24,556 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 124.30
+2026-05-30 12:46:26,436 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Raise left eyebrow' (Hold time: 171.2ms)
+2026-05-30 12:46:27,494 INFO VoiceController: _listen_loop: El micrófono escuchó: 'hearthstone'
+2026-05-30 12:46:27,892 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.19
+2026-05-30 12:46:28,944 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Lower left eyebrow' (Hold time: 169.6ms)
+2026-05-30 12:46:29,573 INFO VoiceController: _listen_loop: El micrófono escuchó: 'en perfect'
+2026-05-30 12:46:30,000 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Lower left eyebrow' (Hold time: 175.1ms)
+2026-05-30 12:46:31,215 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 121.16
+2026-05-30 12:46:32,743 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Raise left eyebrow' (Hold time: 169.7ms)
+2026-05-30 12:46:34,373 INFO VoiceController: _listen_loop: El micrófono escuchó: 'tienen sus tres cosas'
+2026-05-30 12:46:34,541 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 123.56
+2026-05-30 12:46:37,869 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 125.96
+2026-05-30 12:46:39,385 INFO VoiceController: _listen_loop: El micrófono escuchó: 'sí'
+2026-05-30 12:46:41,197 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 128.00
+2026-05-30 12:46:41,383 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Lower left eyebrow' (Hold time: 168.5ms)
+2026-05-30 12:46:42,210 INFO root: close_all: Close all
+2026-05-30 12:46:42,211 INFO root: close_all: Auto-ending research session on close_all protocol.
+2026-05-30 12:46:42,224 INFO DatabaseManager: end_research_session: Ended research session 4db41cc6-c215-4397-942d-83a71e19cc5b
+2026-05-30 12:46:42,225 INFO PageHome: end_active_session: Research logging session ended. Duration: 105.4s
+2026-05-30 12:46:42,236 INFO Pipeline: stop: Stopping Pipeline background thread...
+2026-05-30 12:46:43,241 INFO TaskKiller: exit: Exit program
+2026-05-30 12:46:43,243 INFO CameraManager: destroy: Destroying Threadcamera
+2026-05-30 12:46:43,544 INFO CameraManager: destroy: Threadcamera destroyed
+2026-05-30 12:46:43,567 INFO VoiceController: stop: Stop VoiceController singleton
+2026-05-30 12:46:43,778 INFO root: remove_fonts: Removing font assets/fonts/GoogleSans-Bold.ttf
+2026-05-30 12:46:43,785 INFO root: remove_fonts: Removing font assets/fonts/GoogleSans-Medium.ttf
+2026-05-30 12:46:43,786 INFO root: remove_fonts: Removing font assets/fonts/GoogleSans-Regular.ttf
+2026-05-30 12:46:43,842 INFO root: exit: Kill psutil.Process(pid=17560, name='python.exe', status='running', started='12:44:03'), []

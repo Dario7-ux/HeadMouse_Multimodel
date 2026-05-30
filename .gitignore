@@ -1,0 +1,17 @@
+﻿# Python virtual environments
+.venv/
+venv/
+ENV/
+
+# Compiled outputs and installers
+dist_installer/
+dist/
+build/
+*.exe
+
+# Large AI / Language models
+assets/models/
+
+# Python caches
+__pycache__/
+*.pyc

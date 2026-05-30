@@ -1,0 +1,22 @@
+{
+    "fix_width": 640, 
+    "fix_height": 480, 
+    "camera_id": 0, 
+    "tracking_vert_idxs": [
+        1
+    ], 
+    "spd_up": 18.0, 
+    "spd_down": 22.0, 
+    "spd_left": 18.0, 
+    "spd_right": 18.0, 
+    "pointer_smooth": 6.0, 
+    "shape_smooth": 11, 
+    "tick_interval_ms": 8, 
+    "hold_trigger_ms": 250, 
+    "auto_play": true, 
+    "mouse_acceleration": true, 
+    "use_transformation_matrix": false, 
+    "one_euro_min_cutoff": 2.5, 
+    "one_euro_beta": 0.015, 
+    "one_euro_d_cutoff": 1.0
+}

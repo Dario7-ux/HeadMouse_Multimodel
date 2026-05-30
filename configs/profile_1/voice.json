@@ -1,0 +1,12 @@
+{
+    "enabled": true,
+    "language": "es-ES",
+    "microphone_id": 0,
+    "confidence_threshold": 0.5,
+    "voice_sensitivity": 50,
+    "auto_type": true,
+    "confirmation_required": false,
+    "pause_during_cursor": true,
+    "speech_timeout_ms": 5000,
+    "voice_feedback": true
+}
