@@ -231,13 +231,13 @@ class VoiceController(metaclass=Singleton):
         # Comprobar comandos de voz normalizados
         norm_text = text.lower().strip().rstrip(".").rstrip(",")
         
-        # Comandos en español natural puro "escribir", "silencio" para evitar transcripciones erróneas
-        if any(w in norm_text for w in ["escribir", "escritura", "escribe", "escriba", "iniciar escritura", "activar escritura", "iniciar voz", "activar voz", "voz activa", "voz up", "vos up", "boss up", "bos up", "voz on", "vos on", "boss on", "bos on"]):
+        # Comandos en español natural puro "silencio", "desactivar" para evitar que frases como "desactivar escritura" activen la escritura
+        if any(w in norm_text for w in ["silencio", "no escribir", "dejar de escribir", "deja de escribir", "parar de escribir", "para de escribir", "desactivar escritura", "pausar escritura", "detener escritura", "pausa escritura", "detener voz", "desactivar voz", "pausar voz", "voz down", "vos down", "boss down", "bos down", "voz off", "vos off", "voz of", "vos of", "boss off", "boss of", "bos off", "bos of"]):
             from src.config_manager import ConfigManager
-            ConfigManager().update_voice_config({"auto_type": True})
-            self.speak_confirmation("Escritura activada")
+            ConfigManager().update_voice_config({"auto_type": False})
+            self.speak_confirmation("Escritura desactivada")
             if self._ui_callback:
-                self._ui_callback("[Comando: Escritura activada]")
+                self._ui_callback("[Comando: Escritura desactivada]")
             from src.gui.pages.page_home import PageHome
             home = PageHome.get_instance()
             if home:
@@ -247,12 +247,12 @@ class VoiceController(metaclass=Singleton):
                     pass
             return
             
-        elif any(w in norm_text for w in ["silencio", "no escribir", "dejar de escribir", "deja de escribir", "parar de escribir", "para de escribir", "desactivar escritura", "pausar escritura", "detener escritura", "pausa escritura", "detener voz", "desactivar voz", "pausar voz", "voz down", "vos down", "boss down", "bos down", "voz off", "vos off", "voz of", "vos of", "boss off", "boss of", "bos off", "bos of"]):
+        elif any(w in norm_text for w in ["escribir", "escritura", "escribe", "escriba", "iniciar escritura", "activar escritura", "iniciar voz", "activar voz", "voz activa", "voz up", "vos up", "boss up", "bos up", "voz on", "vos on", "boss on", "bos on"]):
             from src.config_manager import ConfigManager
-            ConfigManager().update_voice_config({"auto_type": False})
-            self.speak_confirmation("Escritura desactivada")
+            ConfigManager().update_voice_config({"auto_type": True})
+            self.speak_confirmation("Escritura activada")
             if self._ui_callback:
-                self._ui_callback("[Comando: Escritura desactivada]")
+                self._ui_callback("[Comando: Escritura activada]")
             from src.gui.pages.page_home import PageHome
             home = PageHome.get_instance()
             if home:
