@@ -3,6 +3,7 @@
 from pathlib import Path
 import mediapipe
 import customtkinter
+import vosk
 
 block_cipher = None
 
@@ -12,16 +13,19 @@ mp_modules =  Path(mp_init.parent,"modules")
 ctk_init = Path(customtkinter.__file__)
 ctk_modules =  Path(ctk_init.parent,"modules")
 
+vosk_init = Path(vosk.__file__)
+
 
 
 app = Analysis(
     ['run_app.py'],
-    pathex=[],
+    pathex=['.'],
     binaries=[],
     datas=[(mp_modules.as_posix(), 'mediapipe/modules'),
                     ('assets','assets'),
                     ('configs','configs'),    
-                    (ctk_init.parent.as_posix(), 'customtkinter')],
+                    (ctk_init.parent.as_posix(), 'customtkinter'),
+                    (vosk_init.parent.as_posix(), 'vosk')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
