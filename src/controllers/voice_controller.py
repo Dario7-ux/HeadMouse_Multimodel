@@ -342,25 +342,16 @@ class VoiceController(metaclass=Singleton):
                 logger.error(f"Error al registrar la telemetría de voz: {e}")
 
         # === COMANDOS DE VOZ PARA CLICS DE RATÓN ===
-        if norm_text in ["click izquierdo", "clic izquierdo", "click", "clic"]:
+        if any(w in norm_text for w in ["doble click derecho", "doble clic derecho"]):
             import pydirectinput
-            pydirectinput.click(button="left")
-            self.speak_confirmation("Clic izquierdo")
+            pydirectinput.click(button="right", clicks=2, interval=0.1)
+            self.speak_confirmation("Doble clic derecho")
             if self._ui_callback:
-                self._ui_callback("[Comando: Clic izquierdo]")
-            log_custom_event(event_type="click", action="voice_click_left", is_click=True, click_count=1)
+                self._ui_callback("[Comando: Doble clic derecho]")
+            log_custom_event(event_type="double_click", action="voice_double_click_right", is_click=True, click_count=2)
             return
 
-        elif norm_text in ["click derecho", "clic derecho"]:
-            import pydirectinput
-            pydirectinput.click(button="right")
-            self.speak_confirmation("Clic derecho")
-            if self._ui_callback:
-                self._ui_callback("[Comando: Clic derecho]")
-            log_custom_event(event_type="click", action="voice_click_right", is_click=True, click_count=1)
-            return
-
-        elif norm_text in ["doble click izquierdo", "doble clic izquierdo", "doble click", "doble clic"]:
+        elif any(w in norm_text for w in ["doble click izquierdo", "doble clic izquierdo", "doble click", "doble clic"]):
             import pydirectinput
             pydirectinput.click(button="left", clicks=2, interval=0.1)
             self.speak_confirmation("Doble clic izquierdo")
@@ -369,13 +360,22 @@ class VoiceController(metaclass=Singleton):
             log_custom_event(event_type="double_click", action="voice_double_click_left", is_click=True, click_count=2)
             return
 
-        elif norm_text in ["doble click derecho", "doble clic derecho"]:
+        elif any(w in norm_text for w in ["click derecho", "clic derecho"]):
             import pydirectinput
-            pydirectinput.click(button="right", clicks=2, interval=0.1)
-            self.speak_confirmation("Doble clic derecho")
+            pydirectinput.click(button="right")
+            self.speak_confirmation("Clic derecho")
             if self._ui_callback:
-                self._ui_callback("[Comando: Doble clic derecho]")
-            log_custom_event(event_type="double_click", action="voice_double_click_right", is_click=True, click_count=2)
+                self._ui_callback("[Comando: Clic derecho]")
+            log_custom_event(event_type="click", action="voice_click_right", is_click=True, click_count=1)
+            return
+
+        elif any(w in norm_text for w in ["click izquierdo", "clic izquierdo", "click", "clic"]):
+            import pydirectinput
+            pydirectinput.click(button="left")
+            self.speak_confirmation("Clic izquierdo")
+            if self._ui_callback:
+                self._ui_callback("[Comando: Clic izquierdo]")
+            log_custom_event(event_type="click", action="voice_click_left", is_click=True, click_count=1)
             return
 
         # # # === APP LAUNCHER VOICE COMMANDS ===
