@@ -175,6 +175,34 @@ class ConfigManager(metaclass=Singleton):
             cursor_data = self.db.get_cursor_config(profile_name)
 
         self.config = cursor_data
+        
+        # Cargar plantilla por defecto como base de respaldo para evitar KeyErrors
+        default_template = {
+            "fix_width": 640,
+            "fix_height": 480,
+            "camera_id": 0,
+            "tracking_vert_idxs": [1],
+            "spd_up": 18.0,
+            "spd_down": 22.0,
+            "spd_left": 18.0,
+            "spd_right": 18.0,
+            "pointer_smooth": 6.0,
+            "shape_smooth": 11,
+            "tick_interval_ms": 8,
+            "hold_trigger_ms": 250,
+            "auto_play": True,
+            "mouse_acceleration": True,
+            "use_transformation_matrix": False,
+            "one_euro_min_cutoff": 2.5,
+            "one_euro_beta": 0.015,
+            "one_euro_d_cutoff": 1.0
+        }
+        
+        # Mezclar plantilla y datos reales para robustez total
+        merged_config = copy.deepcopy(default_template)
+        merged_config.update(cursor_data)
+        self.config = merged_config
+
         self.mouse_bindings = self.db.get_bindings(profile_name, "mouse")
         self.keyboard_bindings = self.db.get_bindings(profile_name, "keyboard")
 
