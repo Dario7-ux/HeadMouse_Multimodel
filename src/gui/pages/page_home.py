@@ -346,6 +346,65 @@ class PageHome(SafeDisposableFrame):
         from src.controllers.voice_controller import VoiceController
         VoiceController().register_ui_callback(self.update_speech_display)
 
+        # ─── Card: Gestos de Raton configurados ───────────────────────────────
+        self._mouse_bindings_frame = customtkinter.CTkFrame(
+            right_column, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER
+        )
+        self._mouse_bindings_frame.grid(row=1, column=0, padx=15, pady=8, sticky="ew")
+        self._mouse_bindings_frame.grid_columnconfigure(0, weight=1)
+
+        _mb_header = customtkinter.CTkFrame(self._mouse_bindings_frame, fg_color="transparent")
+        _mb_header.grid(row=0, column=0, padx=15, pady=(15, 4), sticky="w")
+        _mb_accent = customtkinter.CTkFrame(_mb_header, fg_color="#E8711A", width=4, height=18, corner_radius=2)
+        _mb_accent.grid(row=0, column=0, padx=(0, 10), sticky="ns")
+        customtkinter.CTkLabel(
+            _mb_header, text="Gestos de Raton Configurados",
+            text_color=TEXT_TITLE,
+            font=customtkinter.CTkFont(family="Google Sans", size=15, weight="bold")
+        ).grid(row=0, column=1, sticky="w")
+
+        customtkinter.CTkLabel(
+            self._mouse_bindings_frame,
+            text="Gestos faciales asignados a acciones del raton:",
+            text_color=TEXT_SECONDARY,
+            font=customtkinter.CTkFont(family="Google Sans", size=12)
+        ).grid(row=1, column=0, padx=15, pady=(0, 6), sticky="w")
+
+        # Container dinamico — se reconstruye en refresh_gesture_bindings()
+        self._mouse_bindings_inner = customtkinter.CTkFrame(
+            self._mouse_bindings_frame, fg_color="transparent")
+        self._mouse_bindings_inner.grid(row=2, column=0, padx=12, pady=(0, 12), sticky="ew")
+        self._mouse_bindings_inner.grid_columnconfigure(0, weight=1)
+
+        # ─── Card: Teclas por Gesto configuradas ──────────────────────────────
+        self._kb_bindings_frame = customtkinter.CTkFrame(
+            right_column, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER
+        )
+        self._kb_bindings_frame.grid(row=2, column=0, padx=15, pady=8, sticky="ew")
+        self._kb_bindings_frame.grid_columnconfigure(0, weight=1)
+
+        _kb_header = customtkinter.CTkFrame(self._kb_bindings_frame, fg_color="transparent")
+        _kb_header.grid(row=0, column=0, padx=15, pady=(15, 4), sticky="w")
+        _kb_accent = customtkinter.CTkFrame(_kb_header, fg_color="#8E44AD", width=4, height=18, corner_radius=2)
+        _kb_accent.grid(row=0, column=0, padx=(0, 10), sticky="ns")
+        customtkinter.CTkLabel(
+            _kb_header, text="Teclas por Gesto Configuradas",
+            text_color=TEXT_TITLE,
+            font=customtkinter.CTkFont(family="Google Sans", size=15, weight="bold")
+        ).grid(row=0, column=1, sticky="w")
+
+        customtkinter.CTkLabel(
+            self._kb_bindings_frame,
+            text="Gestos faciales asignados a teclas del teclado:",
+            text_color=TEXT_SECONDARY,
+            font=customtkinter.CTkFont(family="Google Sans", size=12)
+        ).grid(row=1, column=0, padx=15, pady=(0, 6), sticky="w")
+
+        self._kb_bindings_inner = customtkinter.CTkFrame(
+            self._kb_bindings_frame, fg_color="transparent")
+        self._kb_bindings_inner.grid(row=2, column=0, padx=12, pady=(0, 12), sticky="ew")
+        self._kb_bindings_inner.grid_columnconfigure(0, weight=1)
+
         # Trigger live ticks
         self.after(500, self.update_live_badges)
         self.after(100, self.track_cursor_movement)
@@ -536,11 +595,118 @@ class PageHome(SafeDisposableFrame):
             self.recording_status_label.configure(
                 text=f"Error al exportar: {e}", text_color="#D93025")
 
+    def refresh_gesture_bindings(self):
+        """Reconstruye las cards de gestos de raton y teclas con los bindings actuales del perfil activo."""
+        from src.config_manager import ConfigManager
+        import src.shape_list as shape_list
+
+        # Traducciones legibles para acciones del raton
+        MOUSE_ACTION_LABELS = {
+            "left":   "Clic izquierdo",
+            "right":  "Clic derecho",
+            "middle": "Clic central",
+            "pause":  "Pausar / Reanudar cursor",
+            "reset":  "Restablecer cursor al centro",
+            "cycle":  "Cambiar entre monitores",
+        }
+        MODE_LABELS = {"hold": "Mantener", "single": "Pulsar"}
+        GESTURE_LABELS = shape_list.gesture_translation_map
+
+        def _rebuild_card(inner_frame, bindings, action_labels, show_mode=True):
+            """Destruye y reconstruye los widgets dentro del inner_frame."""
+            for w in inner_frame.winfo_children():
+                w.destroy()
+
+            if not bindings:
+                empty_lbl = customtkinter.CTkLabel(
+                    inner_frame,
+                    text="Sin asignaciones configuradas. Ve a la seccion correspondiente para agregar.",
+                    text_color="gray",
+                    font=customtkinter.CTkFont(family="Google Sans", size=12),
+                    wraplength=380, justify="left"
+                )
+                empty_lbl.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+                return
+
+            card = customtkinter.CTkFrame(
+                inner_frame, fg_color=BG_PRIMARY, corner_radius=10,
+                border_width=1, border_color=BORDER)
+            card.grid(row=0, column=0, padx=6, pady=4, sticky="ew")
+            card.grid_columnconfigure(0, minsize=190)
+            card.grid_columnconfigure(1, minsize=26)
+            card.grid_columnconfigure(2, weight=1)
+            if show_mode:
+                card.grid_columnconfigure(3, minsize=80)
+
+            for row_idx, (gesture, vals) in enumerate(bindings.items()):
+                _, action, thres, mode = vals
+                gesture_label = GESTURE_LABELS.get(gesture, gesture)
+                action_label  = action_labels.get(action, action.upper())
+                mode_label    = MODE_LABELS.get(mode, mode)
+                thres_pct     = int(round(float(thres) * 100))
+
+                # Columna 0: gesto
+                gesture_lbl = customtkinter.CTkLabel(
+                    card, text=f"  {gesture_label}",
+                    text_color=("#1B66C9", "#8AB4F8"),
+                    font=customtkinter.CTkFont(family="Google Sans", size=12, weight="bold"),
+                    anchor="w"
+                )
+                gesture_lbl.grid(row=row_idx, column=0, padx=(10, 4), pady=5, sticky="w")
+
+                # Columna 1: flecha
+                customtkinter.CTkLabel(
+                    card, text="➔",
+                    text_color=TEXT_SECONDARY,
+                    font=customtkinter.CTkFont(family="Google Sans", size=12)
+                ).grid(row=row_idx, column=1, padx=4, pady=5)
+
+                # Columna 2: accion + umbral
+                action_text = f"{action_label}  ({thres_pct}%)"
+                customtkinter.CTkLabel(
+                    card, text=action_text,
+                    text_color=TEXT_PRIMARY,
+                    font=customtkinter.CTkFont(family="Google Sans", size=12),
+                    anchor="w"
+                ).grid(row=row_idx, column=2, padx=(4, 8), pady=5, sticky="w")
+
+                # Columna 3: modo (solo para teclado)
+                if show_mode:
+                    mode_color = "#188038" if mode == "single" else "#1A73E8"
+                    mode_tag = customtkinter.CTkLabel(
+                        card, text=f"  {mode_label}  ",
+                        text_color="white",
+                        fg_color=mode_color,
+                        corner_radius=6,
+                        font=customtkinter.CTkFont(family="Google Sans", size=10, weight="bold")
+                    )
+                    mode_tag.grid(row=row_idx, column=3, padx=(4, 10), pady=5, sticky="e")
+
+                # Linea separadora (excepto ultima)
+                if row_idx < len(bindings) - 1:
+                    sep = customtkinter.CTkFrame(card, height=1, fg_color=BORDER, corner_radius=0)
+                    sep.grid(row=row_idx, column=0, columnspan=4 if show_mode else 3,
+                             padx=10, pady=0, sticky="ew")
+
+        try:
+            mouse_bindings = ConfigManager().mouse_bindings
+            _rebuild_card(self._mouse_bindings_inner, mouse_bindings, MOUSE_ACTION_LABELS, show_mode=False)
+        except Exception as e:
+            logger.error(f"Error al reconstruir card de gestos de raton: {e}")
+
+        try:
+            kb_bindings = ConfigManager().keyboard_bindings
+            _rebuild_card(self._kb_bindings_inner, kb_bindings, {}, show_mode=True)
+        except Exception as e:
+            logger.error(f"Error al reconstruir card de teclas: {e}")
+
     def enter(self):
         super().enter()
         # Auto-start recording when entering this page
         if not self.is_recording:
             self.after(500, self.toggle_recording)
+        # Refresh gesture binding cards every time the user navigates to home
+        self.after(50, self.refresh_gesture_bindings)
 
     def leave(self):
         super().leave()
