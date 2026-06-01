@@ -16,7 +16,7 @@ from src.gui.theme_colors import BG_CARD, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_ACC
 
 logger = logging.getLogger("PageKeyboard")
 
-DEFAULT_TRIGGER_TYPE = "hold"
+DEFAULT_TRIGGER_TYPE = "single"
 LIGHT_RED = "#F95245"
 RED = "#E94235"
 GREEN = "#34A853"
@@ -98,7 +98,11 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
             div["selected_gesture"] = gesture_name
             div["entry_field"].configure(image=self.blank_a_button_image)
             div["combobox"].set(shape_list.gesture_translation_map.get(gesture_name, gesture_name))
-            div["slider"].set(int(bind_info[2] * 100))
+            div["slider"].set(round(bind_info[2] * 100))
+            # Restore saved trigger mode ("single" or "hold")
+            saved_mode = bind_info[3] if len(bind_info) > 3 else "single"
+            div["mode_var"].set("Mantener" if saved_mode == "hold" else "Pulsar")
+            div["mode_selector"].grid()
             div["combobox"].grid()
             div["tips_label"].grid()
             div["subtle_label"].grid()
@@ -118,7 +122,7 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
         div = self.create_div(row=self.next_empty_row,
                               div_name=div_name,
                               gesture_name="None",
-                              bind_info=["keyboard", "None", 0.5, "hold"])
+                              bind_info=["keyboard", "None", 0.5, "single"])
 
         self.divs[div_name] = div
         self.next_empty_row += 1
@@ -273,6 +277,21 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
         volume_bar.grid_remove()
         subtle_label.grid_remove()
 
+        # Mode selector: "Pulsar" (single) / "Mantener" (hold)
+        mode_var = tk.StringVar(value="Pulsar")
+        mode_selector = customtkinter.CTkSegmentedButton(
+            master=self,
+            values=["Pulsar", "Mantener"],
+            variable=mode_var,
+            width=DIV_WIDTH,
+            command=partial(self._on_mode_change, div_name))
+        mode_selector.grid(row=row,
+                           column=0,
+                           padx=PAD_X,
+                           pady=(178, 10),
+                           sticky="nw")
+        mode_selector.grid_remove()
+
         return {
             "entry_field": entry_field,
             "combobox": drop,
@@ -280,6 +299,8 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
             "slider": slider,
             "volume_bar": volume_bar,
             "subtle_label": subtle_label,
+            "mode_selector": mode_selector,
+            "mode_var": mode_var,
             "selected_gesture": gesture_name,
             "selected_key_action": key_action,
             "remove_button": remove_button
@@ -299,12 +320,15 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
 
         # Set the keybinding
         thres_value = div["slider"].get() / 100
+        # Read trigger mode from the UI selector
+        mode_label = div["mode_var"].get() if "mode_var" in div else "Pulsar"
+        trigger_type = "hold" if mode_label == "Mantener" else "single"
         ConfigManager().set_temp_keyboard_binding(
             device="keyboard",
             key_action=div["selected_key_action"],
             gesture=div["selected_gesture"],
             threshold=thres_value,
-            trigger_type=DEFAULT_TRIGGER_TYPE)
+            trigger_type=trigger_type)
         ConfigManager().apply_keyboard_bindings()
 
     def wait_for_key(self, div_name: str, entry_button, keydown: tk.Event):
@@ -410,14 +434,21 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
             div["volume_bar"].grid()
             div["tips_label"].grid()
             div["subtle_label"].grid()
+            div["mode_selector"].grid()
         else:
             div["slider"].grid_remove()
             div["volume_bar"].grid_remove()
             div["tips_label"].grid_remove()
             div["subtle_label"].grid_remove()
+            div["mode_selector"].grid_remove()
 
         self.set_new_keyboard_binding(div)
         self.inner_refresh_profile()
+
+    def _on_mode_change(self, div_name: str, new_mode: str):
+        """Callback when the user toggles between Pulsar (single) and Mantener (hold)."""
+        if div_name in self.divs:
+            self.set_new_keyboard_binding(self.divs[div_name])
 
     def slider_drag_callback(self, div_name: str, new_value: str):
         """Update value when slider being drag

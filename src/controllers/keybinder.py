@@ -116,36 +116,63 @@ class Keybinder(metaclass=Singleton):
                     self.holding = False
                     self.start_hold_ts = math.inf
 
+    # Mapa de keysyms de pyautogui a pydirectinput para teclas especiales que difieren
+    _PYDIRECTINPUT_KEY_MAP = {
+        "shiftleft": "shift",   "shiftright": "shift",
+        "ctrlleft": "ctrl",     "ctrlright": "ctrl",
+        "altleft": "alt",       "altright": "alt",
+        "pagedown": "pagedown", "pageup": "pageup",
+        "capslock": "capslock",
+        "win": "win",
+        "numlock": "numlock",
+    }
+
     def keyboard_action(self, is_triggered, is_stable_active, keysym, mode):
         keysym = keysym.lower()
         state_name = "keyboard_" + keysym
 
         import pyautogui
+
+        # Resolver alias para pydirectinput (teclas especiales)
+        pdi_keysym = self._PYDIRECTINPUT_KEY_MAP.get(keysym, keysym)
+
         if mode == "hold":
             if is_stable_active and (self.key_states[state_name] is False):
                 try:
                     pyautogui.keyDown(keysym)
                 except Exception:
-                    import pydirectinput
-                    pydirectinput.keyDown(keysym)
+                    try:
+                        pydirectinput.keyDown(pdi_keysym)
+                    except Exception as e:
+                        logger.warning(f"keyDown fallido para '{keysym}' / '{pdi_keysym}': {e}")
                 self.key_states[state_name] = True
                 self._log_research_event("key_hold_start", keysym)
             elif (not is_stable_active) and (self.key_states[state_name] is True):
                 try:
                     pyautogui.keyUp(keysym)
                 except Exception:
-                    import pydirectinput
-                    pydirectinput.keyUp(keysym)
+                    try:
+                        pydirectinput.keyUp(pdi_keysym)
+                    except Exception as e:
+                        logger.warning(f"keyUp fallido para '{keysym}' / '{pdi_keysym}': {e}")
                 self.key_states[state_name] = False
                 self._log_research_event("key_hold_end", keysym)
-        else: # pulsación única
+        else:  # Pulsacion unica (single)
             if is_triggered:
+                success = False
                 try:
                     pyautogui.press(keysym)
+                    success = True
                 except Exception:
-                    import pydirectinput
-                    pydirectinput.press(keysym)
-                self._log_research_event("keystroke", keysym)
+                    pass
+                if not success:
+                    try:
+                        pydirectinput.press(pdi_keysym)
+                        success = True
+                    except Exception as e:
+                        logger.warning(f"press fallido para '{keysym}' / '{pdi_keysym}': {e}")
+                if success:
+                    self._log_research_event("keystroke", keysym)
 
     def _log_research_event(self, event_type: str, action: str):
         """Registra eventos de activación de acciones en la sesión de investigación activa."""

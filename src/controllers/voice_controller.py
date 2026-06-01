@@ -229,14 +229,34 @@ class VoiceController(metaclass=Singleton):
             self.tts_queue.put(msg)
 
     def _on_speech_recognized(self, text: str):
-        """Ejecuta acciones basadas en el habla reconocida: escribe en las casillas enfocadas y registra telemetría."""
+        """Ejecuta acciones basadas en el habla reconocida: escribe en las casillas enfocadas y registra telemetria."""
         self.recognized_text = text
-        
+
         # Comprobar comandos de voz normalizados
         norm_text = text.lower().strip().rstrip(".").rstrip(",")
-        
-        # Comandos en español natural puro "silencio", "desactivar" para evitar que frases como "desactivar escritura" activen la escritura
-        if any(w in norm_text for w in ["silencio", "no escribir", "dejar de escribir", "deja de escribir", "parar de escribir", "para de escribir", "desactivar escritura", "pausar escritura", "detener escritura", "pausa escritura", "detener voz", "desactivar voz", "pausar voz", "voz down", "vos down", "boss down", "bos down", "voz off", "vos off", "voz of", "vos of", "boss off", "boss of", "bos off", "bos of"]):
+
+        # Helpers de deteccion de palabras
+        def _has_word(phrase, word):
+            """Comprueba si word aparece como token independiente en phrase."""
+            return (" " + word + " ") in (" " + phrase + " ")
+
+        def _has_any_word(phrase, words):
+            return any(_has_word(phrase, w) for w in words)
+
+        def _has_any_substr(phrase, substrs):
+            return any(s in phrase for s in substrs)
+
+        # 1. Guardia de DESACTIVACION de escritura (evalua primero para mayor seguridad)
+        STOP_WRITE = [
+            "silencio", "no escribir", "dejar de escribir", "deja de escribir",
+            "parar de escribir", "para de escribir", "desactivar escritura",
+            "pausar escritura", "detener escritura", "pausa escritura",
+            "detener voz", "desactivar voz", "pausar voz",
+            "voz down", "vos down", "boss down", "bos down",
+            "voz off", "vos off", "voz of", "vos of",
+            "boss off", "boss of", "bos off", "bos of",
+        ]
+        if _has_any_substr(norm_text, STOP_WRITE):
             from src.config_manager import ConfigManager
             ConfigManager().update_voice_config({"auto_type": False})
             self.speak_confirmation("Escritura desactivada")
@@ -250,8 +270,15 @@ class VoiceController(metaclass=Singleton):
                 except Exception:
                     pass
             return
-            
-        elif any(w in norm_text for w in ["escribir", "escritura", "escribe", "escriba", "iniciar escritura", "activar escritura", "iniciar voz", "activar voz", "voz activa", "voz up", "vos up", "boss up", "bos up", "voz on", "vos on", "boss on", "bos on"]):
+
+        # 2. Guardia de ACTIVACION de escritura
+        START_WRITE_SUBSTRS = [
+            "activar escritura", "iniciar escritura", "activar voz", "iniciar voz",
+            "voz activa", "voz up", "vos up", "boss up", "bos up",
+            "voz on", "vos on", "boss on", "bos on",
+        ]
+        _WRITE_EXACT_WORDS = ["escribir", "escritura", "escribe", "escriba"]
+        if _has_any_substr(norm_text, START_WRITE_SUBSTRS) or _has_any_word(norm_text, _WRITE_EXACT_WORDS):
             from src.config_manager import ConfigManager
             ConfigManager().update_voice_config({"auto_type": True})
             self.speak_confirmation("Escritura activada")
@@ -266,27 +293,22 @@ class VoiceController(metaclass=Singleton):
                     pass
             return
 
-
-        # 3. Comandos de control de la sesión de telemetría
+        # 3. Comandos de control de sesion
         words = norm_text.split()
-        is_focuz_brand = any(w in words for w in ["focuz", "focus", "focu", "focuvoz", "focusvoz", "focuvoz"])
+        is_focuz_brand = any(w in words for w in ["focuz", "focus", "focu", "focuvoz", "focusvoz"])
 
-        if is_focuz_brand and any(w in words for w in ["go", "goo"]):
-            # Deshabilitado por solicitud del usuario
-            return
-
-        elif is_focuz_brand and any(w in words for w in ["finish", "finis", "finsh", "fini", "fin", "cerrar", "cierra", "exit"]):
+        if is_focuz_brand and any(w in words for w in ["finish", "finis", "finsh", "fini", "fin", "cerrar", "cierra", "exit", "finalizar"]):
             from src.gui.pages.page_home import PageHome
             home = PageHome.get_instance()
             if home:
-                self.speak_confirmation("Cerrando aplicación")
+                self.speak_confirmation("Cerrando aplicacion")
                 if self._ui_callback:
-                    self._ui_callback("[Comando: Cerrando aplicación]")
+                    self._ui_callback("[Comando: Cerrando aplicacion]")
                 home.after(100, lambda: home.root_callback("close_app") if home.root_callback else None)
             return
 
-        # Función auxiliar para registrar telemetría de acciones de voz
-        def log_custom_event(event_type: str, action: str, extra_voice_text: str = None, is_click: bool = False, click_count: int = 1):
+        # Funcion auxiliar para registrar telemetria
+        def log_custom_event(event_type, action, extra_voice_text=None, is_click=False, click_count=1):
             try:
                 from src.gui.pages.page_home import PageHome
                 home_page = PageHome.get_instance()
@@ -305,10 +327,16 @@ class VoiceController(metaclass=Singleton):
                     else:
                         home_page.total_voice_commands += 1
             except Exception as e:
-                logger.error(f"Error al registrar la telemetría de voz: {e}")
+                logger.error(f"Error al registrar la telemetria de voz: {e}")
 
-        # === COMANDOS DE VOZ PARA CLICS DE RATÓN ===
-        if any(w in norm_text for w in ["doble click derecho", "doble clic derecho"]):
+        # 4. Comandos de CLICS con variantes foneticas que Vosk en espanol puede producir
+        CLICK_VARIANTS = ["click", "clic", "klik", "clik", "clique", "klick", "klic", "klique"]
+        DOUBLE_RIGHT = ["doble click derecho", "doble clic derecho", "doble klik derecho", "doble klick derecho"]
+        DOUBLE_LEFT  = ["doble click izquierdo", "doble clic izquierdo",
+                        "doble click", "doble clic", "doble klik", "doble klick"]
+        RIGHT_CLICK  = ["click derecho", "clic derecho", "klik derecho", "klick derecho"]
+
+        if _has_any_substr(norm_text, DOUBLE_RIGHT):
             pyautogui.click(button="right", clicks=2, interval=0.1)
             self.speak_confirmation("Doble clic derecho")
             if self._ui_callback:
@@ -316,7 +344,7 @@ class VoiceController(metaclass=Singleton):
             log_custom_event(event_type="double_click", action="voice_double_click_right", is_click=True, click_count=2)
             return
 
-        elif any(w in norm_text for w in ["doble click izquierdo", "doble clic izquierdo", "doble click", "doble clic"]):
+        elif _has_any_substr(norm_text, DOUBLE_LEFT):
             pyautogui.click(button="left", clicks=2, interval=0.1)
             self.speak_confirmation("Doble clic izquierdo")
             if self._ui_callback:
@@ -324,7 +352,7 @@ class VoiceController(metaclass=Singleton):
             log_custom_event(event_type="double_click", action="voice_double_click_left", is_click=True, click_count=2)
             return
 
-        elif any(w in norm_text for w in ["click derecho", "clic derecho"]):
+        elif _has_any_substr(norm_text, RIGHT_CLICK):
             pyautogui.click(button="right")
             self.speak_confirmation("Clic derecho")
             if self._ui_callback:
@@ -332,7 +360,8 @@ class VoiceController(metaclass=Singleton):
             log_custom_event(event_type="click", action="voice_click_right", is_click=True, click_count=1)
             return
 
-        elif any(w in norm_text for w in ["click izquierdo", "clic izquierdo", "click", "clic"]):
+        elif _has_any_word(norm_text, CLICK_VARIANTS):
+            # Click izquierdo simple: solo si la variante aparece como palabra aislada
             pyautogui.click(button="left")
             self.speak_confirmation("Clic izquierdo")
             if self._ui_callback:
@@ -340,11 +369,11 @@ class VoiceController(metaclass=Singleton):
             log_custom_event(event_type="click", action="voice_click_left", is_click=True, click_count=1)
             return
 
-        # # # === APP LAUNCHER VOICE COMMANDS ===
+        # 5. Comandos para abrir aplicaciones
         elif norm_text in ["abrir navegador", "abrir internet", "iniciar navegador", "iniciar internet"]:
-            import os
+            import os as _os
             try:
-                os.startfile("https://www.google.com")
+                _os.startfile("https://www.google.com")
             except Exception:
                 import webbrowser
                 webbrowser.open("https://www.google.com")
@@ -355,13 +384,12 @@ class VoiceController(metaclass=Singleton):
             return
 
         elif norm_text in ["abrir word", "iniciar word", "abrir microsoft word"]:
-            import os
-            import subprocess
+            import os as _os, subprocess as _sp
             try:
-                os.startfile("winword.exe")
+                _os.startfile("winword.exe")
             except Exception:
                 try:
-                    subprocess.Popen("start winword", shell=True)
+                    _sp.Popen("start winword", shell=True)
                 except Exception as e:
                     logger.error(f"Error launching Word: {e}")
             self.speak_confirmation("Abriendo Word")
@@ -371,30 +399,32 @@ class VoiceController(metaclass=Singleton):
             return
 
         elif norm_text in ["abrir bloc de notas", "abrir notas", "abrir notepad", "iniciar bloc de notas"]:
-            import subprocess
-            subprocess.Popen("notepad.exe")
+            import subprocess as _sp
+            _sp.Popen("notepad.exe")
             self.speak_confirmation("Abriendo bloc de notas")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Notas]")
             log_custom_event(event_type="voice_command", action="launch_notepad", extra_voice_text=norm_text)
             return
 
-        # Comprobar comandos especiales de edición/borrado de voz cuando la escritura automática está activa
-        if self.should_auto_type():
+        # 6. Leer auto_type directamente de ConfigManager para evitar desync de config
+        from src.config_manager import ConfigManager as _CM
+        _auto_type_active = _CM().get_voice_config().get("auto_type", False)
+
+        if _auto_type_active:
             cmd_text = norm_text.strip().rstrip(".").rstrip(",")
-            
-            # 1. Comando: "borrar todo" / "eliminar todo" / "limpiar" -> ¡Seleccionar todo y borrar!
+
+            # Borrar todo el texto
             if cmd_text in ["borrar todo", "eliminar todo", "limpiar todo", "limpiar"]:
                 logger.info("[VOICE COMMAND] Clear all text triggered!")
                 try:
                     with self.keyboard_controller.pressed(keyboard.Key.ctrl):
-                        self.keyboard_controller.press('a')
-                        self.keyboard_controller.release('a')
+                        self.keyboard_controller.press("a")
+                        self.keyboard_controller.release("a")
                     self.keyboard_controller.press(keyboard.Key.backspace)
                     self.keyboard_controller.release(keyboard.Key.backspace)
                 except Exception as e:
-                    logger.error(f"Error al ejecutar el comando de voz para borrar todo: {e}")
-                    
+                    logger.error(f"Error al borrar todo: {e}")
                 if self._ui_callback:
                     try:
                         self._ui_callback("[Comando: Texto Borrado]")
@@ -402,7 +432,7 @@ class VoiceController(metaclass=Singleton):
                         pass
                 return
 
-            # 2. Comando: "borrar" / "eliminar" / "corregir" / "deshacer" -> ¡Borrar último segmento escrito!
+            # Borrar ultimo segmento escrito
             elif cmd_text in ["borrar", "eliminar", "corregir", "deshacer"]:
                 logger.info("[VOICE COMMAND] Delete last typed segment triggered!")
                 last_len = getattr(self, "last_typed_len", 0)
@@ -411,19 +441,17 @@ class VoiceController(metaclass=Singleton):
                         for _ in range(last_len):
                             self.keyboard_controller.press(keyboard.Key.backspace)
                             self.keyboard_controller.release(keyboard.Key.backspace)
-                            time.sleep(0.005) # Pequeño retraso para estabilidad de hardware
+                            time.sleep(0.005)
                     except Exception as e:
-                        logger.error(f"Error al borrar último segmento: {e}")
-                    self.last_typed_len = 0 # Consumido
+                        logger.error(f"Error al borrar segmento: {e}")
+                    self.last_typed_len = 0
                 else:
-                    # Borrado genérico de la última palabra (8 caracteres) si no hay historial
                     try:
                         for _ in range(8):
                             self.keyboard_controller.press(keyboard.Key.backspace)
                             self.keyboard_controller.release(keyboard.Key.backspace)
                     except Exception:
                         pass
-                
                 if self._ui_callback:
                     try:
                         self._ui_callback("[Comando: Deshacer segmento]")
@@ -431,29 +459,26 @@ class VoiceController(metaclass=Singleton):
                         pass
                 return
 
-        # 1. Simular la escritura del teclado en el campo de entrada activo
-        if self.should_auto_type():
-            # Añadir espacio al final para flujo natural de palabras
+        # 7. Dictado automatico de texto al campo enfocado
+        if _auto_type_active:
             typed_str = text + " "
             self.last_typed_len = len(typed_str)
             self.type_text(typed_str)
 
-        # 2. Disparar callback seguro para actualizar indicadores en tiempo real
+        # 8. Actualizar UI con el texto reconocido
         if self._ui_callback:
             try:
                 self._ui_callback(text)
             except Exception as e:
                 logger.error(f"Error al actualizar la UI: {e}")
 
-        # 3. Registrar el evento en SQLite para la sesión activa de investigación
+        # 9. Registrar en SQLite para la sesion activa de investigacion
         try:
             from src.gui.pages.page_home import PageHome
             home_page = PageHome.get_instance()
             if home_page and home_page.is_recording:
-                # Calcular duración de habla aproximada (400ms por palabra)
                 word_count = len(text.split())
                 approx_duration_ms = word_count * 400.0
-                
                 DatabaseManager().log_research_event(
                     session_id=home_page.session_id,
                     event_type="voice_dictation",
@@ -464,7 +489,8 @@ class VoiceController(metaclass=Singleton):
                 )
                 home_page.total_voice_commands += 1
         except Exception as e:
-            logger.error(f"Error al registrar la telemetría de voz: {e}")
+            logger.error(f"Error al registrar la telemetria de voz: {e}")
+
 
     def register_ui_callback(self, callback: callable):
         """Registrar un callback seguro para hilos para enviar el texto reconocido a la interfaz de usuario."""
