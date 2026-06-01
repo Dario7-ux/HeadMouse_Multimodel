@@ -268,6 +268,8 @@ class FrameSelectGesture(SafeDisposableFrame):
     def update_volume_preview(self):
 
         bs = FaceMesh().get_blendshapes()
+        if bs is None:
+            return
 
         for div_name, div in self.divs.items():
 

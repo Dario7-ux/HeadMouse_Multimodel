@@ -441,6 +441,8 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
     def update_volume_preview(self):
 
         bs = FaceMesh().get_blendshapes()
+        if bs is None:
+            return
 
         for div in self.divs.values():
 
