@@ -50,7 +50,7 @@ class MainGui():
                                                     self.cam_preview_callback,
                                                     logger_name="frame_preview")
         # Colocar en la parte inferior del menú usando la fila con peso
-        menu_bottom_row = len(self.frame_menu.btns) + 4
+        menu_bottom_row = len(self.frame_menu.btns) + 5
         self.frame_menu.grid_rowconfigure(menu_bottom_row, weight=1)
         self.frame_preview.grid(row=menu_bottom_row,
                                 column=0,
@@ -147,8 +147,16 @@ class MainGui():
     def root_function_callback(self, function_name, args: dict = {}, **kwargs):
         logger.info(f"root_function_callback {function_name} with {args}")
 
+        # Cerrar aplicación
+        if function_name == "close_app":
+            if hasattr(self, "close_all"):
+                self.close_all()
+            else:
+                self.del_main_gui()
+            return
+
         # Navegación básica de páginas
-        if function_name == "change_page":
+        elif function_name == "change_page":
             self.change_page(args["target"])
             self.frame_menu.set_tab_active(tab_name=args["target"])
 

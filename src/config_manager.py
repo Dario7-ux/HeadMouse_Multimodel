@@ -163,7 +163,7 @@ class ConfigManager(metaclass=Singleton):
         if self.curr_profile_name.get() == old_profile_name:
             self.curr_profile_name.set(new_profile_name)
 
-    def load_profile(self, profile_name: str) -> list[bool, Path]:
+    def load_profile(self, profile_name: str) -> None:
         profile_path = Path(DEFAULT_JSON.parent, profile_name)
         logger.info(f"Loading profile from SQLite: {profile_name}")
 

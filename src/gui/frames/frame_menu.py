@@ -1,5 +1,6 @@
 from functools import partial
 import tkinter as tk
+from PIL import Image
 
 import customtkinter
 
@@ -10,6 +11,7 @@ from src.gui.theme_colors import (
     MENU_BTN_TEXT, MENU_BTN_ACTIVE_TEXT, MENU_DIVIDER,
     ACCENT, TEXT_PRIMARY, TEXT_SECONDARY, BG_CARD
 )
+from src.utils import get_resource_path
 
 # Elementos del menú: (page_key, emoji, label)
 MENU_ITEMS = [
@@ -27,13 +29,24 @@ class FrameMenu(SafeDisposableFrame):
     def __init__(self, master, master_callback: callable, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.grid_rowconfigure(len(MENU_ITEMS) + 3, weight=1)
+        self.grid_rowconfigure(len(MENU_ITEMS) + 4, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.grid_propagate(False)
         self.configure(fg_color=MENU_BG)
 
         self.master_callback = master_callback
         self.current_active = None
+
+        # ── Logotipo Bimodal ──
+        light_img = Image.open(get_resource_path("assets/images/FVB.png")).resize((180, 88), Image.LANCZOS)
+        dark_img = Image.open(get_resource_path("assets/images/FVA.png")).resize((180, 88), Image.LANCZOS)
+        self.logo_image = customtkinter.CTkImage(
+            light_image=light_img,
+            dark_image=dark_img,
+            size=(180, 88)
+        )
+        self.logo_label = customtkinter.CTkLabel(self, image=self.logo_image, text="")
+        self.logo_label.grid(row=0, column=0, padx=15, pady=(15, 5), sticky="n")
 
         # ── Botón selector de perfil ──
         profile_btn = customtkinter.CTkButton(
@@ -51,10 +64,10 @@ class FrameMenu(SafeDisposableFrame):
             anchor="w",
             command=partial(self.master_callback, "show_profile_switcher"))
 
-        profile_btn.grid(row=0,
+        profile_btn.grid(row=1,
                          column=0,
                          padx=15,
-                         pady=(15, 10),
+                         pady=(5, 10),
                          sticky="nw")
 
         # ── Botones de navegación ──
@@ -77,7 +90,7 @@ class FrameMenu(SafeDisposableFrame):
                     function_name="change_page",
                     args={"target": page_key}))
 
-            btn.grid(row=idx + 1,
+            btn.grid(row=idx + 2,
                      column=0,
                      padx=15,
                      pady=2,
@@ -90,7 +103,7 @@ class FrameMenu(SafeDisposableFrame):
             height=1,
             fg_color=MENU_DIVIDER,
             corner_radius=0)
-        separator.grid(row=len(MENU_ITEMS) + 1,
+        separator.grid(row=len(MENU_ITEMS) + 2,
                        column=0,
                        padx=25,
                        pady=8,
@@ -108,7 +121,7 @@ class FrameMenu(SafeDisposableFrame):
             text_color=TEXT_PRIMARY,
             command=self._on_voice_write_toggle
         )
-        self.voice_write_switch.grid(row=len(MENU_ITEMS) + 2,
+        self.voice_write_switch.grid(row=len(MENU_ITEMS) + 3,
                                      column=0,
                                      padx=25,
                                      pady=(10, 2),

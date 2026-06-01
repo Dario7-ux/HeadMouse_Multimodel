@@ -4,7 +4,7 @@
     "microphone_id": 0,
     "confidence_threshold": 0.29999999999999993,
     "voice_sensitivity": 41,
-    "auto_type": false,
+    "auto_type": true,
     "confirmation_required": false,
     "pause_during_cursor": true,
     "speech_timeout_ms": 5000,

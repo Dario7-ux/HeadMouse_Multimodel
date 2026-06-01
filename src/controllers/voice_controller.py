@@ -5,6 +5,10 @@ import json
 import os
 import pynput.keyboard as keyboard
 import pyaudio
+import pyautogui
+
+pyautogui.PAUSE = 0
+pyautogui.FAILSAFE = False
 
 from src.singleton_meta import Singleton
 from src.utils.database import DatabaseManager
@@ -262,60 +266,23 @@ class VoiceController(metaclass=Singleton):
                     pass
             return
 
-        # 2. Comandos de activación/desactivación del cursor
-        # Comandos en español natural puro "mover", "quieto" para evitar transcripciones erróneas
-        elif any(w in norm_text for w in ["mover", "iniciar cursor", "activar cursor", "cursor activo", "cursor on", "cursosr on"]):
-            from src.controllers.mouse_controller import MouseController
-            from src.gui.pages.page_home import PageHome
-            home = PageHome.get_instance()
-            if home:
-                home.after(1, lambda: MouseController().set_active(True))
-            else:
-                MouseController().set_active(True)
-            self.speak_confirmation("Control facial activado")
-            if self._ui_callback:
-                self._ui_callback("[Comando: Control facial activado]")
-            return
-            
-        elif any(w in norm_text for w in ["quieto", "detener cursor", "desactivar cursor", "pausar cursor", "cursor off", "cursosr off"]):
-            from src.controllers.mouse_controller import MouseController
-            from src.gui.pages.page_home import PageHome
-            home = PageHome.get_instance()
-            if home:
-                home.after(1, lambda: MouseController().set_active(False))
-            else:
-                MouseController().set_active(False)
-            self.speak_confirmation("Control facial desactivado")
-            if self._ui_callback:
-                self._ui_callback("[Comando: Control facial desactivado]")
-            return
 
         # 3. Comandos de control de la sesión de telemetría
-        elif "focuzvoz go" in norm_text or "focuzvoz goo" in norm_text:
-            from src.gui.pages.page_home import PageHome
-            home = PageHome.get_instance()
-            if home:
-                if not home.is_recording:
-                    # Comprobar si se ha ingresado un nombre
-                    name = home.name_entry.get().strip()
-                    if not name:
-                        home.name_entry.delete(0, 'end')
-                        home.name_entry.insert(0, "Participante")
-                    home.after(1, home.toggle_recording)
-                    self.speak_confirmation("Sesión iniciada")
-                    if self._ui_callback:
-                        self._ui_callback("[Comando: Sesión iniciada]")
+        words = norm_text.split()
+        is_focuz_brand = any(w in words for w in ["focuz", "focus", "focu", "focuvoz", "focusvoz", "focuvoz"])
+
+        if is_focuz_brand and any(w in words for w in ["go", "goo"]):
+            # Deshabilitado por solicitud del usuario
             return
 
-        elif "focuzvoz finish" in norm_text:
+        elif is_focuz_brand and any(w in words for w in ["finish", "finis", "finsh", "fini", "fin", "cerrar", "cierra", "exit"]):
             from src.gui.pages.page_home import PageHome
             home = PageHome.get_instance()
             if home:
-                if home.is_recording:
-                    home.after(1, home.toggle_recording)
-                    self.speak_confirmation("Sesión finalizada")
-                    if self._ui_callback:
-                        self._ui_callback("[Comando: Sesión finalizada]")
+                self.speak_confirmation("Cerrando aplicación")
+                if self._ui_callback:
+                    self._ui_callback("[Comando: Cerrando aplicación]")
+                home.after(100, lambda: home.root_callback("close_app") if home.root_callback else None)
             return
 
         # Función auxiliar para registrar telemetría de acciones de voz
@@ -324,8 +291,7 @@ class VoiceController(metaclass=Singleton):
                 from src.gui.pages.page_home import PageHome
                 home_page = PageHome.get_instance()
                 if home_page and home_page.is_recording:
-                    import pydirectinput
-                    x, y = pydirectinput.position()
+                    x, y = pyautogui.position()
                     DatabaseManager().log_research_event(
                         session_id=home_page.session_id,
                         event_type=event_type,
@@ -343,8 +309,7 @@ class VoiceController(metaclass=Singleton):
 
         # === COMANDOS DE VOZ PARA CLICS DE RATÓN ===
         if any(w in norm_text for w in ["doble click derecho", "doble clic derecho"]):
-            import pydirectinput
-            pydirectinput.click(button="right", clicks=2, interval=0.1)
+            pyautogui.click(button="right", clicks=2, interval=0.1)
             self.speak_confirmation("Doble clic derecho")
             if self._ui_callback:
                 self._ui_callback("[Comando: Doble clic derecho]")
@@ -352,8 +317,7 @@ class VoiceController(metaclass=Singleton):
             return
 
         elif any(w in norm_text for w in ["doble click izquierdo", "doble clic izquierdo", "doble click", "doble clic"]):
-            import pydirectinput
-            pydirectinput.click(button="left", clicks=2, interval=0.1)
+            pyautogui.click(button="left", clicks=2, interval=0.1)
             self.speak_confirmation("Doble clic izquierdo")
             if self._ui_callback:
                 self._ui_callback("[Comando: Doble clic izquierdo]")
@@ -361,8 +325,7 @@ class VoiceController(metaclass=Singleton):
             return
 
         elif any(w in norm_text for w in ["click derecho", "clic derecho"]):
-            import pydirectinput
-            pydirectinput.click(button="right")
+            pyautogui.click(button="right")
             self.speak_confirmation("Clic derecho")
             if self._ui_callback:
                 self._ui_callback("[Comando: Clic derecho]")
@@ -370,8 +333,7 @@ class VoiceController(metaclass=Singleton):
             return
 
         elif any(w in norm_text for w in ["click izquierdo", "clic izquierdo", "click", "clic"]):
-            import pydirectinput
-            pydirectinput.click(button="left")
+            pyautogui.click(button="left")
             self.speak_confirmation("Clic izquierdo")
             if self._ui_callback:
                 self._ui_callback("[Comando: Clic izquierdo]")

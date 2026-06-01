@@ -7,7 +7,7 @@ from PIL import Image
 from src.gui.frames.safe_disposable_frame import SafeDisposableFrame
 from src.gui.theme_colors import (
     TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TITLE,
-    ACCENT, BG_CARD, BORDER
+    ACCENT, BG_CARD, BORDER, BG_PRIMARY
 )
 
 logger = logging.getLogger("PageHome")
@@ -15,9 +15,9 @@ LOGO_SIZE = (240, 118)
 
 # Instructions details
 STEPS = [
-    ("1️⃣ Mueve tu Nariz 🎯", "Mueve tu cabeza/nariz suavemente\npara controlar el puntero en la pantalla."),
-    ("2️⃣ Apunta y Clica 🖱️", "Lleva el cursor hasta el campo de abajo\ny haz tu gesto facial para seleccionarlo."),
-    ("3️⃣ Di tu Nombre 🎤", "Cuando el campo esté enfocado, di tu\nnombre para escribirlo con tu voz.")
+    ("Paso 1: Mueve tu Nariz", "Mueve tu cabeza/nariz suavemente\npara controlar el puntero en la pantalla."),
+    ("Paso 2: Apunta y Clica", "Lleva el cursor hasta el campo de abajo\ny haz tu gesto facial para seleccionarlo."),
+    ("Paso 3: Di tu Nombre", "Cuando el campo esté enfocado, di tu\nnombre para escribirlo con tu voz.")
 ]
 
 
@@ -48,93 +48,85 @@ class PageHome(SafeDisposableFrame):
         # Scrollable center container
         center = customtkinter.CTkScrollableFrame(self, fg_color="transparent")
         center.grid(row=0, column=0, sticky="nswe", padx=10, pady=5)
-        center.grid_columnconfigure(0, weight=1)
+        
+        # We split center into two main columns
+        center.grid_columnconfigure(0, weight=1, minsize=420)
+        center.grid_columnconfigure(1, weight=1, minsize=420)
 
-        # --- Top Header ---
+        # --- Top Header (Spans across both columns) ---
         header_frame = customtkinter.CTkFrame(center, fg_color="transparent")
-        header_frame.grid(row=0, column=0, pady=(5, 10))
+        header_frame.grid(row=0, column=0, columnspan=2, pady=(10, 15), sticky="w")
         header_frame.grid_columnconfigure(0, weight=1)
 
-        from src.utils import get_resource_path
-
-        light_img = Image.open(get_resource_path("assets/images/FVB.png")).resize(LOGO_SIZE, Image.LANCZOS)
-        dark_img = Image.open(get_resource_path("assets/images/FVA.png")).resize(LOGO_SIZE, Image.LANCZOS)
-        logo_image = customtkinter.CTkImage(
-            light_image=light_img,
-            dark_image=dark_img,
-            size=LOGO_SIZE)
-
-        logo_label = customtkinter.CTkLabel(header_frame, image=logo_image, text="")
-        logo_label.grid(row=0, column=0, pady=(5, 2))
+        title_lbl = customtkinter.CTkLabel(
+            header_frame,
+            text="FocuzVoz - Panel de Control",
+            text_color=TEXT_TITLE,
+            font=customtkinter.CTkFont(family="Google Sans", size=24, weight="bold")
+        )
+        title_lbl.grid(row=0, column=0, sticky="w", padx=25)
 
         tagline = customtkinter.CTkLabel(
             header_frame,
-            text="Control facial e inteligencia de voz bimodal",
-            text_color=TEXT_PRIMARY,
-            font=customtkinter.CTkFont(family="Google Sans", size=15, weight="bold"))
-        tagline.grid(row=1, column=0, pady=(0, 2))
+            text="Monitoreo en tiempo real y asistencia de voz bimodal",
+            text_color=TEXT_SECONDARY,
+            font=customtkinter.CTkFont(family="Google Sans", size=13))
+        tagline.grid(row=1, column=0, sticky="w", padx=25, pady=(2, 0))
+
+        # --- TWO MAIN COLUMN CONTAINER FRAMES ---
+        left_column = customtkinter.CTkFrame(center, fg_color="transparent")
+        left_column.grid(row=1, column=0, sticky="nsew", padx=(10, 10), pady=0)
+        left_column.grid_columnconfigure(0, weight=1)
+
+        right_column = customtkinter.CTkFrame(center, fg_color="transparent")
+        right_column.grid(row=1, column=1, sticky="nsew", padx=(10, 10), pady=0)
+        right_column.grid_columnconfigure(0, weight=1)
+
+        # ==========================================
+        # === COLUMN 0 (LEFT): MONITOREO, REGISTRO & PASOS ===
+        # ==========================================
 
         # --- Live Status Badges & Voice Captions ---
-        status_frame = customtkinter.CTkFrame(center, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER)
-        status_frame.grid(row=1, column=0, padx=25, pady=8, sticky="ew")
-        status_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        status_frame = customtkinter.CTkFrame(left_column, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER)
+        status_frame.grid(row=0, column=0, padx=15, pady=8, sticky="ew")
+        status_frame.grid_columnconfigure((0, 1), weight=1)
 
-        # Badges
+        # Badges (2x2 layout inside left_column to avoid overflow)
         self.mouse_badge = customtkinter.CTkLabel(
             status_frame, text="🖱️ CONTROL FACIAL", text_color="white",
-            corner_radius=8, fg_color="gray", width=180, height=28,
+            corner_radius=8, fg_color="gray", height=28,
             font=customtkinter.CTkFont(family="Google Sans", size=11, weight="bold"))
-        self.mouse_badge.grid(row=0, column=0, padx=10, pady=10)
+        self.mouse_badge.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
         self.voice_badge = customtkinter.CTkLabel(
             status_frame, text="🎤 MICRÓFONO", text_color="white",
-            corner_radius=8, fg_color="gray", width=180, height=28,
+            corner_radius=8, fg_color="gray", height=28,
             font=customtkinter.CTkFont(family="Google Sans", size=11, weight="bold"))
-        self.voice_badge.grid(row=0, column=1, padx=10, pady=10)
+        self.voice_badge.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
         self.record_badge = customtkinter.CTkLabel(
             status_frame, text="⚪ SESIÓN PAUSADA", text_color="white",
-            corner_radius=8, fg_color="gray", width=180, height=28,
+            corner_radius=8, fg_color="gray", height=28,
             font=customtkinter.CTkFont(family="Google Sans", size=11, weight="bold"))
-        self.record_badge.grid(row=0, column=2, padx=10, pady=10)
+        self.record_badge.grid(row=1, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="ew")
 
         # Real-time Voice Transcription Caption Box
         self.speech_monitor_label = customtkinter.CTkLabel(
             status_frame,
             text="🎤 Micrófono pasivo listo. Comienza a hablar...",
             text_color=TEXT_SECONDARY,
+            wraplength=380,
             font=customtkinter.CTkFont(family="Google Sans", size=13, slant="italic"))
-        self.speech_monitor_label.grid(row=1, column=0, columnspan=3, pady=(5, 12))
-
-        # --- Accessibility step-by-step instructions dashboard ---
-        guide_frame = customtkinter.CTkFrame(center, fg_color="transparent")
-        guide_frame.grid(row=2, column=0, padx=25, pady=8, sticky="ew")
-        guide_frame.grid_columnconfigure((0, 1, 2), weight=1)
-
-        for idx, (title, desc) in enumerate(STEPS):
-            step_card = customtkinter.CTkFrame(guide_frame, fg_color=BG_CARD, corner_radius=10, border_width=1, border_color=BORDER)
-            step_card.grid(row=0, column=idx, padx=6, pady=4, sticky="nsew")
-            step_card.grid_columnconfigure(0, weight=1)
-
-            st_title = customtkinter.CTkLabel(
-                step_card, text=title, text_color=TEXT_PRIMARY,
-                font=customtkinter.CTkFont(family="Google Sans", size=12, weight="bold"))
-            st_title.grid(row=0, column=0, padx=8, pady=(8, 2), sticky="w")
-
-            st_desc = customtkinter.CTkLabel(
-                step_card, text=desc, text_color=TEXT_SECONDARY, justify="left",
-                font=customtkinter.CTkFont(family="Google Sans", size=11))
-            st_desc.grid(row=1, column=0, padx=8, pady=(0, 8), sticky="w")
+        self.speech_monitor_label.grid(row=2, column=0, columnspan=2, pady=(5, 12), sticky="ew")
 
         # --- Research Participant Registry Card & Exporter ---
-        registry_frame = customtkinter.CTkFrame(center, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER)
-        registry_frame.grid(row=3, column=0, padx=25, pady=12, sticky="ew")
-        registry_frame.grid_columnconfigure(0, weight=2)
-        registry_frame.grid_columnconfigure(1, weight=1)
+        registry_frame = customtkinter.CTkFrame(left_column, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER)
+        registry_frame.grid(row=1, column=0, padx=15, pady=12, sticky="ew")
+        registry_frame.grid_columnconfigure(0, weight=1)
 
         # Left Column: Registry Input
         self.input_subframe = customtkinter.CTkFrame(registry_frame, fg_color="transparent")
-        self.input_subframe.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
+        self.input_subframe.grid(row=0, column=0, padx=15, pady=(15, 5), sticky="nsew")
         self.input_subframe.grid_columnconfigure(0, weight=1)
 
         # Container for Input fields (Shown when NOT recording)
@@ -148,34 +140,33 @@ class PageHome(SafeDisposableFrame):
         self.name_label.grid(row=0, column=0, pady=(0, 4), sticky="w")
 
         self.name_entry = customtkinter.CTkEntry(
-            self.input_container, placeholder_text="Apunta con tu nariz, haz clic y escribe tu nombre...",
+            self.input_container, placeholder_text="Apunta con tu nariz, haz clic y escribe...",
             height=36, font=customtkinter.CTkFont(family="Google Sans", size=13))
         self.name_entry.grid(row=1, column=0, sticky="ew")
 
-        # Container for Active Session details (Shown when recording)
+        # Container for Active Session details (Shown when recording - Stacked vertically to avoid layout squeeze)
         self.active_session_frame = customtkinter.CTkFrame(self.input_subframe, fg_color="transparent")
         self.active_session_frame.grid_columnconfigure(0, weight=1)
-        self.active_session_frame.grid_columnconfigure(1, weight=1)
 
         self.active_user_label = customtkinter.CTkLabel(
             self.active_session_frame, text="👤 Participante: None",
-            text_color=ACCENT, font=customtkinter.CTkFont(family="Google Sans", size=14, weight="bold"))
-        self.active_user_label.grid(row=0, column=0, padx=(0, 15), sticky="w")
+            text_color=ACCENT, font=customtkinter.CTkFont(family="Google Sans", size=13, weight="bold"))
+        self.active_user_label.grid(row=0, column=0, pady=(2, 2), sticky="w")
 
         self.timer_label = customtkinter.CTkLabel(
             self.active_session_frame, text="⏱️ Tiempo: 00:00",
-            text_color=TEXT_PRIMARY, font=customtkinter.CTkFont(family="Google Sans", size=14, weight="bold"))
-        self.timer_label.grid(row=0, column=1, padx=15, sticky="w")
+            text_color=TEXT_PRIMARY, font=customtkinter.CTkFont(family="Google Sans", size=13, weight="bold"))
+        self.timer_label.grid(row=1, column=0, pady=(2, 2), sticky="w")
 
         # Live status feedback text (placed on row 1)
         self.recording_status_label = customtkinter.CTkLabel(
             self.input_subframe, text="Ingresa tu nombre para habilitar el registro de investigación.",
             text_color="gray", font=customtkinter.CTkFont(family="Google Sans", size=11))
-        self.recording_status_label.grid(row=1, column=0, pady=(6, 0), sticky="w")
+        self.recording_status_label.grid(row=2, column=0, pady=(6, 0), sticky="w")
 
-        # Right Column: Usability Control Buttons
+        # Bottom Subframe for Buttons
         btn_subframe = customtkinter.CTkFrame(registry_frame, fg_color="transparent")
-        btn_subframe.grid(row=0, column=1, padx=15, pady=15, sticky="nsew")
+        btn_subframe.grid(row=1, column=0, padx=15, pady=(5, 15), sticky="nsew")
         btn_subframe.grid_columnconfigure(0, weight=1)
 
         self.export_btn = customtkinter.CTkButton(
@@ -184,6 +175,172 @@ class PageHome(SafeDisposableFrame):
             border_color="#1A73E8", border_width=1, text_color="#1A73E8", hover_color="#E8F0FE",
             font=customtkinter.CTkFont(family="Google Sans", size=12, weight="bold"))
         self.export_btn.grid(row=0, column=0, pady=4, sticky="ew")
+
+        # --- Accessibility step-by-step instructions dashboard (Sleek Timeline Card) ---
+        guide_frame = customtkinter.CTkFrame(left_column, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER)
+        guide_frame.grid(row=2, column=0, padx=15, pady=8, sticky="ew")
+        guide_frame.grid_columnconfigure(0, weight=1)
+
+        # Header for the guide with left blue accent bar
+        guide_header = customtkinter.CTkFrame(guide_frame, fg_color="transparent")
+        guide_header.grid(row=0, column=0, padx=15, pady=(15, 10), sticky="w")
+        
+        accent_bar_g = customtkinter.CTkFrame(guide_header, fg_color=ACCENT, width=4, height=18, corner_radius=2)
+        accent_bar_g.grid(row=0, column=0, padx=(0, 10), sticky="ns")
+
+        guide_header_lbl = customtkinter.CTkLabel(
+            guide_header, text="Pasos para empezar a usar FocuzVoz", text_color=TEXT_TITLE,
+            font=customtkinter.CTkFont(family="Google Sans", size=14, weight="bold"))
+        guide_header_lbl.grid(row=0, column=1, sticky="w")
+
+        # Container for Steps
+        steps_container = customtkinter.CTkFrame(guide_frame, fg_color="transparent")
+        steps_container.grid(row=1, column=0, padx=15, pady=(0, 15), sticky="ew")
+        steps_container.grid_columnconfigure(0, weight=1)
+
+        for idx, (title, desc) in enumerate(STEPS):
+            step_row = customtkinter.CTkFrame(steps_container, fg_color="transparent")
+            step_row.grid(row=idx, column=0, pady=6, sticky="ew")
+            step_row.grid_columnconfigure(1, weight=1)
+
+            # Circular number icon
+            num_lbl = customtkinter.CTkLabel(
+                step_row, text=f" {idx + 1} ", text_color="white", fg_color=ACCENT,
+                corner_radius=12, width=24, height=24,
+                font=customtkinter.CTkFont(family="Google Sans", size=11, weight="bold")
+            )
+            num_lbl.grid(row=0, column=0, padx=(0, 12), sticky="nw")
+
+            # Text block next to number
+            text_block = customtkinter.CTkFrame(step_row, fg_color="transparent")
+            text_block.grid(row=0, column=1, sticky="ew")
+            text_block.grid_columnconfigure(0, weight=1)
+
+            st_title = customtkinter.CTkLabel(
+                text_block, text=title.replace(f"Paso {idx+1}: ", ""), text_color=TEXT_PRIMARY,
+                font=customtkinter.CTkFont(family="Google Sans", size=12, weight="bold"))
+            st_title.grid(row=0, column=0, sticky="w")
+
+            st_desc = customtkinter.CTkLabel(
+                text_block, text=desc, text_color=TEXT_SECONDARY, justify="left",
+                font=customtkinter.CTkFont(family="Google Sans", size=11))
+            st_desc.grid(row=1, column=0, sticky="w")
+
+        # ==========================================
+        # === COLUMN 1 (RIGHT): COMANDOS DE VOZ COMPLETO ===
+        # ==========================================
+
+        # --- Voice Commands Quick Guide Card ---
+        commands_guide_frame = customtkinter.CTkFrame(
+            right_column, fg_color=BG_CARD, corner_radius=12, border_width=1, border_color=BORDER
+        )
+        commands_guide_frame.grid(row=0, column=0, padx=15, pady=8, sticky="nsew")
+        commands_guide_frame.grid_columnconfigure(0, weight=1)
+
+        # Title block with vertical accent bar
+        guide_header = customtkinter.CTkFrame(commands_guide_frame, fg_color="transparent")
+        guide_header.grid(row=0, column=0, padx=15, pady=(15, 4), sticky="w")
+        guide_header.grid_rowconfigure(0, weight=1)
+
+        accent_bar = customtkinter.CTkFrame(guide_header, fg_color=ACCENT, width=4, height=18, corner_radius=2)
+        accent_bar.grid(row=0, column=0, padx=(0, 10), sticky="ns")
+
+        guide_title_lbl = customtkinter.CTkLabel(
+            guide_header,
+            text="Guía Rápida de Comandos de Voz",
+            text_color=TEXT_TITLE,
+            font=customtkinter.CTkFont(family="Google Sans", size=15, weight="bold")
+        )
+        guide_title_lbl.grid(row=0, column=1, sticky="w")
+
+        guide_desc_lbl = customtkinter.CTkLabel(
+            commands_guide_frame,
+            text="Di cualquiera de las siguientes frases para controlar el sistema con tu voz:",
+            text_color=TEXT_SECONDARY,
+            font=customtkinter.CTkFont(family="Google Sans", size=12)
+        )
+        guide_desc_lbl.grid(row=1, column=0, padx=15, pady=(0, 8), sticky="w")
+
+        # Category grids (1 column layout - stacked vertically so they are wide and perfectly clear!)
+        categories_frame = customtkinter.CTkFrame(commands_guide_frame, fg_color="transparent")
+        categories_frame.grid(row=2, column=0, padx=12, pady=(0, 12), sticky="ew")
+        categories_frame.grid_columnconfigure(0, weight=1)
+
+        # Local helper function to draw perfectly aligned and colorized command rows
+        def add_command_row(card, row_idx, command_text, action_text):
+            cmd_lbl = customtkinter.CTkLabel(
+                card, text=command_text,
+                text_color=("#1B66C9", "#8AB4F8"),
+                font=customtkinter.CTkFont(family="Google Sans", size=12, weight="bold")
+            )
+            cmd_lbl.grid(row=row_idx, column=0, padx=(15, 10), pady=5, sticky="w")
+            
+            arrow_lbl = customtkinter.CTkLabel(
+                card, text="➔",
+                text_color=TEXT_SECONDARY,
+                font=customtkinter.CTkFont(family="Google Sans", size=12)
+            )
+            arrow_lbl.grid(row=row_idx, column=1, padx=10, pady=5)
+            
+            act_lbl = customtkinter.CTkLabel(
+                card, text=action_text,
+                text_color=TEXT_PRIMARY,
+                font=customtkinter.CTkFont(family="Google Sans", size=12)
+            )
+            act_lbl.grid(row=row_idx, column=2, padx=(10, 15), pady=5, sticky="w")
+
+        # --- CATEGORY 1: Clics de Ratón ---
+        cat1 = customtkinter.CTkFrame(categories_frame, fg_color=BG_PRIMARY, corner_radius=10, border_width=1, border_color=BORDER)
+        cat1.grid(row=0, column=0, padx=6, pady=6, sticky="ew")
+        cat1.grid_columnconfigure(0, minsize=210)  # Align all columns perfectly!
+        cat1.grid_columnconfigure(1, minsize=30)
+        cat1.grid_columnconfigure(2, weight=1)
+        
+        lbl_cat1 = customtkinter.CTkLabel(
+            cat1, text="Clics de Ratón", text_color=ACCENT,
+            font=customtkinter.CTkFont(family="Google Sans", size=14, weight="bold")
+        )
+        lbl_cat1.grid(row=0, column=0, columnspan=3, padx=15, pady=(12, 6), sticky="w")
+        
+        add_command_row(cat1, 1, '"click" / "clic" / "click izquierdo"', "Clic izquierdo")
+        add_command_row(cat1, 2, '"click derecho" / "clic derecho"', "Clic derecho")
+        add_command_row(cat1, 3, '"doble click" / "doble clic"', "Doble clic izquierdo")
+        add_command_row(cat1, 4, '"doble click derecho"', "Doble clic derecho")
+
+        # --- CATEGORY 2: Dictado y Escritura ---
+        cat2 = customtkinter.CTkFrame(categories_frame, fg_color=BG_PRIMARY, corner_radius=10, border_width=1, border_color=BORDER)
+        cat2.grid(row=1, column=0, padx=6, pady=6, sticky="ew")
+        cat2.grid_columnconfigure(0, minsize=210)  # Align all columns perfectly!
+        cat2.grid_columnconfigure(1, minsize=30)
+        cat2.grid_columnconfigure(2, weight=1)
+        
+        lbl_cat2 = customtkinter.CTkLabel(
+            cat2, text="Dictado y Edición", text_color=ACCENT,
+            font=customtkinter.CTkFont(family="Google Sans", size=14, weight="bold")
+        )
+        lbl_cat2.grid(row=0, column=0, columnspan=3, padx=15, pady=(12, 6), sticky="w")
+        
+        add_command_row(cat2, 1, '"escribir" / "activar escritura"', "Activar dictado de voz")
+        add_command_row(cat2, 2, '"silencio" / "no escribir"', "Pausar dictado de voz")
+        add_command_row(cat2, 3, '"borrar" / "deshacer"', "Borrar último segmento")
+        add_command_row(cat2, 4, '"borrar todo" / "limpiar"', "Limpiar todo el texto")
+
+        # --- CATEGORY 4: Atajos y Sesión ---
+        cat4 = customtkinter.CTkFrame(categories_frame, fg_color=BG_PRIMARY, corner_radius=10, border_width=1, border_color=BORDER)
+        cat4.grid(row=2, column=0, padx=6, pady=6, sticky="ew")
+        cat4.grid_columnconfigure(0, minsize=210)  # Align all columns perfectly!
+        cat4.grid_columnconfigure(1, minsize=30)
+        cat4.grid_columnconfigure(2, weight=1)
+        
+        lbl_cat4 = customtkinter.CTkLabel(
+            cat4, text="Atajos y Sesión", text_color=ACCENT,
+            font=customtkinter.CTkFont(family="Google Sans", size=14, weight="bold")
+        )
+        lbl_cat4.grid(row=0, column=0, columnspan=3, padx=15, pady=(12, 6), sticky="w")
+        
+        add_command_row(cat4, 1, '"abrir navegador" / "abrir internet"', "Google Chrome")
+        add_command_row(cat4, 2, '"abrir bloc de notas" / "abrir word"', "Bloc de notas o Word")
+        add_command_row(cat4, 3, '"focuzvoz finish"', "Cerrar programa")
 
         # Register speech callback in background VoiceController
         from src.controllers.voice_controller import VoiceController
