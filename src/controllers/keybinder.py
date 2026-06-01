@@ -117,20 +117,34 @@ class Keybinder(metaclass=Singleton):
                     self.start_hold_ts = math.inf
 
     def keyboard_action(self, is_triggered, is_stable_active, keysym, mode):
+        keysym = keysym.lower()
         state_name = "keyboard_" + keysym
 
+        import pyautogui
         if mode == "hold":
             if is_stable_active and (self.key_states[state_name] is False):
-                pydirectinput.keyDown(keysym)
+                try:
+                    pyautogui.keyDown(keysym)
+                except Exception:
+                    import pydirectinput
+                    pydirectinput.keyDown(keysym)
                 self.key_states[state_name] = True
                 self._log_research_event("key_hold_start", keysym)
             elif (not is_stable_active) and (self.key_states[state_name] is True):
-                pydirectinput.keyUp(keysym)
+                try:
+                    pyautogui.keyUp(keysym)
+                except Exception:
+                    import pydirectinput
+                    pydirectinput.keyUp(keysym)
                 self.key_states[state_name] = False
                 self._log_research_event("key_hold_end", keysym)
         else: # single
             if is_triggered:
-                pydirectinput.press(keysym)
+                try:
+                    pyautogui.press(keysym)
+                except Exception:
+                    import pydirectinput
+                    pydirectinput.press(keysym)
                 self._log_research_event("keystroke", keysym)
 
     def _log_research_event(self, event_type: str, action: str):

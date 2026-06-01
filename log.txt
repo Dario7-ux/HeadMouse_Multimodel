@@ -1,0 +1,2 @@
+2026-06-01 11:37:14,941 ERROR root: <module>: Failed to monkeypatch PIL.Image.open: No module named 'PIL'
+2026-06-01 11:37:14,942 ERROR root: <module>: Failed to monkeypatch cv2.imread: No module named 'cv2'
