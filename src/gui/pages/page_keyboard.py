@@ -321,8 +321,19 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
             keydown, tk.Event) else keydown
         logger.info(f"Key press: <{div_name}> {keydown_txt}")
 
+        if keydown_txt == "cancel":
+            if self.wait_for_key_bind_id is not None:
+                try:
+                    self.winfo_toplevel().unbind("<KeyPress>", self.wait_for_key_bind_id)
+                except Exception:
+                    pass
+            self.waiting_div = None
+            self.wait_for_key_bind_id = None
+            return
+
+        # Exclude the current div's own key from the occupied check!
         occupied_keys = [
-            div["entry_field"].cget("text") for div in self.divs.values()
+            d["entry_field"].cget("text") for k, d in self.divs.items() if k != div_name
         ]
 
         # Not valid key
@@ -359,7 +370,10 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
                 div["subtle_label"].grid()
 
         if self.wait_for_key_bind_id is not None:
-            self.waiting_button.unbind("<KeyPress>", self.wait_for_key_bind_id)
+            try:
+                self.winfo_toplevel().unbind("<KeyPress>", self.wait_for_key_bind_id)
+            except Exception:
+                pass
         self.refresh_scrollbar()
         self.waiting_div = None
         self.wait_for_key_bind_id = None
@@ -371,8 +385,8 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
         if self.waiting_div is not None:
             self.wait_for_key(self.waiting_div, self.waiting_button, "cancel")
 
-        # Start waiting for key press
-        self.wait_for_key_bind_id = entry_button.bind(
+        # Start waiting for key press on the top-level window for 100% robust capturing
+        self.wait_for_key_bind_id = self.winfo_toplevel().bind(
             "<KeyPress>", partial(self.wait_for_key, div_name, entry_button))
         entry_button.focus_set()
 
