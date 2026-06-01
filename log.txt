@@ -1,53 +1,149 @@
-2026-06-01 12:35:47,145 INFO root: <module>: Successfully monkeypatched PIL.Image.open
-2026-06-01 12:35:47,397 INFO root: <module>: Successfully monkeypatched cv2.imread
-2026-06-01 12:35:49,483 INFO root: <module>: Starting main app.
-2026-06-01 12:35:49,483 INFO TaskKiller: __init__: Intialize TaskKiller singleton
-2026-06-01 12:35:49,484 INFO root: start: Installing google fonts.
-2026-06-01 12:35:49,484 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Bold.ttf
-2026-06-01 12:35:49,485 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Medium.ttf
-2026-06-01 12:35:49,485 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Regular.ttf
-2026-06-01 12:35:49,485 INFO ConfigManager: __init__: Intialize ConfigManager singleton
-2026-06-01 12:35:49,486 INFO DatabaseManager: _init_db: Initializing SQLite database at configs\focuzvoz.db
-2026-06-01 12:35:49,491 INFO ConfigManager: _migrate_to_sqlite: Flesystem profiles: ['default', 'profile_1', 'profile_2']. DB profiles: ['default', 'profile_1', 'profile_2']
-2026-06-01 12:35:49,491 INFO ConfigManager: _migrate_to_sqlite: Automatic SQLite database migration check completed.
-2026-06-01 12:35:49,492 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
-2026-06-01 12:35:49,492 INFO ConfigManager: start: Start ConfigManager singleton
-2026-06-01 12:35:49,492 INFO ConfigManager: load_profile: Loading profile from SQLite: default
-2026-06-01 12:35:49,495 INFO CameraManager: __init__: Intialize CameraManager singleton
-2026-06-01 12:35:49,516 INFO CameraManager: start: Start CameraManager singleton
-2026-06-01 12:35:49,516 INFO CameraManager: __init__: Intializing Threadcamera
-2026-06-01 12:35:49,518 INFO ListCamera: __open_camera_task: Try openning camera: 0
-2026-06-01 12:35:49,518 INFO CameraManager: __init__: Found default camera_id None
-2026-06-01 12:35:49,520 INFO CameraManager: read_camera_loop: Threadcamera main_loop started.
-2026-06-01 12:35:49,520 INFO MouseController: __init__: Intialize MouseController singleton
-2026-06-01 12:35:49,520 INFO MouseController: start: Start MouseController singleton
-2026-06-01 12:35:49,520 INFO OneEuroFilter: __init__: OneEuroFilter2D initialized: min_cutoff=2.5, beta=0.015, d_cutoff=1.0
-2026-06-01 12:35:49,521 INFO MouseController: start: 1 Euro Filter initialized for cursor smoothing
-2026-06-01 12:35:49,521 INFO Keybinder: __init__: Intialize Keybinder singleton
-2026-06-01 12:35:49,521 INFO Keybinder: start: Start Keybinder singleton
-2026-06-01 12:35:49,521 INFO FaceMesh: __init__: Intialize FaceMesh singleton
-2026-06-01 12:35:49,522 INFO FaceMesh: start: Start FaceMesh singleton
-2026-06-01 12:35:49,569 INFO VoiceController: __init__: Initialize VoiceController singleton
-2026-06-01 12:35:49,569 INFO VoiceController: start: Start VoiceController singleton
-2026-06-01 12:35:49,667 INFO comtypes.client._code_cache: _create_comtypes_gen_package: Imported existing <module 'comtypes.gen' from 'C:\\Servidores\\Lectura_FocuzVoz\\FocuzVoz2.1\\.venv\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
-2026-06-01 12:35:49,668 INFO comtypes.client._code_cache: _find_gen_dir: Using writeable comtypes cache directory: 'C:\Servidores\Lectura_FocuzVoz\FocuzVoz2.1\.venv\Lib\site-packages\comtypes\gen'
-2026-06-01 12:35:50,684 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 000001A602CE4430> height: 480 width: 640
-2026-06-01 12:35:50,952 INFO ListCamera: __open_camera_task: Try openning camera: 1
-2026-06-01 12:35:51,360 INFO ListCamera: __open_camera_task: Camera 1: < cv2.VideoCapture 000001A602B93870> height: 480 width: 640
-2026-06-01 12:35:51,391 INFO ListCamera: __open_camera_task: Try openning camera: 2
-2026-06-01 12:35:51,394 WARNING ListCamera: __open_camera_task: Camera 2: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+2026-06-01 17:39:51,182 INFO root: <module>: Successfully monkeypatched PIL.Image.open
+2026-06-01 17:39:51,320 INFO root: <module>: Successfully monkeypatched cv2.imread
+2026-06-01 17:39:52,941 INFO root: <module>: Starting main app.
+2026-06-01 17:39:52,941 INFO TaskKiller: __init__: Intialize TaskKiller singleton
+2026-06-01 17:39:52,941 INFO root: start: Installing google fonts.
+2026-06-01 17:39:52,942 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Bold.ttf
+2026-06-01 17:39:52,947 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Medium.ttf
+2026-06-01 17:39:53,719 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Regular.ttf
+2026-06-01 17:39:54,535 INFO ConfigManager: __init__: Intialize ConfigManager singleton
+2026-06-01 17:39:54,536 INFO DatabaseManager: _init_db: Initializing SQLite database at configs\focuzvoz.db
+2026-06-01 17:39:54,543 INFO ConfigManager: _migrate_to_sqlite: Flesystem profiles: ['default', 'profile_1', 'profile_2']. DB profiles: ['default', 'profile_1', 'profile_2']
+2026-06-01 17:39:54,543 INFO ConfigManager: _migrate_to_sqlite: Automatic SQLite database migration check completed.
+2026-06-01 17:39:54,544 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-06-01 17:39:54,544 INFO ConfigManager: start: Start ConfigManager singleton
+2026-06-01 17:39:54,544 INFO ConfigManager: load_profile: Loading profile from SQLite: default
+2026-06-01 17:39:54,546 INFO CameraManager: __init__: Intialize CameraManager singleton
+2026-06-01 17:39:54,568 INFO CameraManager: start: Start CameraManager singleton
+2026-06-01 17:39:54,568 INFO CameraManager: __init__: Intializing Threadcamera
+2026-06-01 17:39:54,572 INFO ListCamera: __open_camera_task: Try openning camera: 0
+2026-06-01 17:39:54,572 INFO CameraManager: __init__: Found default camera_id None
+2026-06-01 17:39:54,573 INFO CameraManager: read_camera_loop: Threadcamera main_loop started.
+2026-06-01 17:39:54,573 INFO MouseController: __init__: Intialize MouseController singleton
+2026-06-01 17:39:54,575 INFO MouseController: start: Start MouseController singleton
+2026-06-01 17:39:54,577 INFO OneEuroFilter: __init__: OneEuroFilter2D initialized: min_cutoff=2.5, beta=0.015, d_cutoff=1.0
+2026-06-01 17:39:54,577 INFO MouseController: start: 1 Euro Filter initialized for cursor smoothing
+2026-06-01 17:39:54,580 INFO Keybinder: __init__: Intialize Keybinder singleton
+2026-06-01 17:39:54,581 INFO Keybinder: start: Start Keybinder singleton
+2026-06-01 17:39:54,582 INFO FaceMesh: __init__: Intialize FaceMesh singleton
+2026-06-01 17:39:54,583 INFO FaceMesh: start: Start FaceMesh singleton
+2026-06-01 17:39:54,626 INFO VoiceController: __init__: Initialize VoiceController singleton
+2026-06-01 17:39:54,626 INFO VoiceController: start: Start VoiceController singleton
+2026-06-01 17:39:54,695 INFO comtypes.client._code_cache: _create_comtypes_gen_package: Imported existing <module 'comtypes.gen' from 'C:\\Servidores\\Lectura_FocuzVoz\\FocuzVoz2.1\\.venv\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-06-01 17:39:54,696 INFO comtypes.client._code_cache: _find_gen_dir: Using writeable comtypes cache directory: 'C:\Servidores\Lectura_FocuzVoz\FocuzVoz2.1\.venv\Lib\site-packages\comtypes\gen'
+2026-06-01 17:39:55,373 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 000002C3CA7F4430> height: 480 width: 640
+2026-06-01 17:39:55,625 INFO ListCamera: __open_camera_task: Try openning camera: 1
+2026-06-01 17:39:55,767 INFO ListCamera: __open_camera_task: Camera 1: < cv2.VideoCapture 000002C3CA6A3870> height: 480 width: 640
+2026-06-01 17:39:55,782 INFO ListCamera: __open_camera_task: Try openning camera: 2
+2026-06-01 17:39:55,783 WARNING ListCamera: __open_camera_task: Camera 2: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
 
-2026-06-01 12:35:51,394 INFO ListCamera: assign_caps_queue: Camera 2: Failed to open
-2026-06-01 12:35:51,394 INFO ListCamera: __open_camera_task: Try openning camera: 3
-2026-06-01 12:35:51,396 WARNING ListCamera: __open_camera_task: Camera 3: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+2026-06-01 17:39:55,784 INFO ListCamera: assign_caps_queue: Camera 2: Failed to open
+2026-06-01 17:39:55,784 INFO ListCamera: __open_camera_task: Try openning camera: 3
+2026-06-01 17:39:55,784 WARNING ListCamera: __open_camera_task: Camera 3: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
 
-2026-06-01 12:35:51,396 INFO ListCamera: assign_caps_queue: Camera 3: Failed to open
-2026-06-01 12:35:51,396 INFO ListCamera: __open_camera_task: Try openning camera: 4
-2026-06-01 12:35:51,397 WARNING ListCamera: __open_camera_task: Camera 4: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+2026-06-01 17:39:55,785 INFO ListCamera: assign_caps_queue: Camera 3: Failed to open
+2026-06-01 17:39:55,785 INFO ListCamera: __open_camera_task: Try openning camera: 4
+2026-06-01 17:39:55,785 WARNING ListCamera: __open_camera_task: Camera 4: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
 
-2026-06-01 12:35:51,397 INFO ListCamera: assign_caps_queue: Camera 4: Failed to open
-2026-06-01 12:35:51,397 INFO CameraManager: assign_done: Assign cameras completed. Found {0: None, 1: None}
-2026-06-01 12:35:51,397 INFO CameraManager: assign_done: Try to use camera 0
-2026-06-01 12:35:51,397 INFO CameraManager: pick_camera: Pick camera 0, Releasing others...
-2026-06-01 12:35:51,398 INFO ListCamera: __open_camera_task: Try openning camera: 0
-2026-06-01 12:35:52,189 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 000001A618020C30> height: 480 width: 640
+2026-06-01 17:39:55,786 INFO ListCamera: assign_caps_queue: Camera 4: Failed to open
+2026-06-01 17:39:55,786 INFO CameraManager: assign_done: Assign cameras completed. Found {0: None, 1: None}
+2026-06-01 17:39:55,786 INFO CameraManager: assign_done: Try to use camera 0
+2026-06-01 17:39:55,786 INFO CameraManager: pick_camera: Pick camera 0, Releasing others...
+2026-06-01 17:39:55,786 INFO ListCamera: __open_camera_task: Try openning camera: 0
+2026-06-01 17:39:56,236 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 000002C3DFC34C90> height: 480 width: 640
+2026-06-01 17:39:59,882 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 154.93
+2026-06-01 17:40:03,209 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 143.34
+2026-06-01 17:40:06,537 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.88
+2026-06-01 17:40:09,866 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 123.45
+2026-06-01 17:40:13,193 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 125.10
+2026-06-01 17:40:16,521 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 141.65
+2026-06-01 17:40:18,941 INFO VoiceController: _initialize_vosk_model: Modelo de Vosk cargado correctamente (modo fuera de línea - no requiere internet)
+2026-06-01 17:40:18,942 INFO VoiceController: _start_listening_thread: Hilo de fondo para reconocimiento de voz de Vosk lanzado con éxito.
+2026-06-01 17:40:18,942 INFO MainGUi: __init__: Init MainGui
+2026-06-01 17:40:18,942 INFO Pipeline: __init__: Init Pipeline
+2026-06-01 17:40:19,286 INFO VoiceController: _listen_loop: El reconocedor de Vosk está escuchando... (modo fuera de línea)
+2026-06-01 17:40:19,834 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 152.06
+2026-06-01 17:40:20,124 INFO frame_preview: enter: enter
+2026-06-01 17:40:20,125 INFO PageHome: __init__: Create PageHome with Research telemetry and Accessibility guidance
+2026-06-01 17:40:20,920 INFO PageVoice: __init__: Create PageVoice
+2026-06-01 17:40:20,943 INFO VoiceController: update_config: VoiceController config updated: {'enabled': True, 'language': 'es-ES', 'microphone_id': 0, 'confidence_threshold': 0.29999999999999993, 'voice_sensitivity': 41, 'auto_type': False, 'confirmation_required': False, 'pause_during_cursor': True, 'speech_timeout_ms': 5000, 'voice_feedback': True}
+2026-06-01 17:40:20,947 INFO PageVoice: load_initial_config: Voice config loaded successfully
+2026-06-01 17:40:20,947 INFO page_home: enter: enter
+2026-06-01 17:40:20,947 INFO page_camera: leave: leave
+2026-06-01 17:40:20,947 INFO page_cursor: leave: leave
+2026-06-01 17:40:20,947 INFO page_gestures: leave: leave
+2026-06-01 17:40:20,949 INFO FrameSelectGesture: leave: leave
+2026-06-01 17:40:20,949 INFO page_keyboard: leave: leave
+2026-06-01 17:40:20,949 INFO FrameSelectKeyboard: leave: leave
+2026-06-01 17:40:20,949 INFO PageVoice: leave: leave
+2026-06-01 17:40:20,978 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-06-01 17:40:20,983 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-06-01 17:40:20,993 INFO FrameProfileSwitcher: hide_window: hide
+2026-06-01 17:40:21,139 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-06-01 17:40:21,147 INFO FrameProfileEditor: hide_window: hide
+2026-06-01 17:40:21,165 INFO Pipeline: __init__: Init Pipeline
+2026-06-01 17:40:21,166 INFO Pipeline: start: Starting Pipeline background thread...
+2026-06-01 17:40:21,451 WARNING DatabaseManager: add_profile: Profile 'default' already exists.
+2026-06-01 17:40:21,453 INFO ConfigManager: update_voice_config: Voice config backup updated: {'auto_type': False}
+2026-06-01 17:40:21,453 INFO VoiceController: update_config: VoiceController config updated: {'enabled': True, 'language': 'es-ES', 'microphone_id': 0, 'confidence_threshold': 0.29999999999999993, 'voice_sensitivity': 41, 'auto_type': False, 'confirmation_required': False, 'pause_during_cursor': True, 'speech_timeout_ms': 5000, 'voice_feedback': True}
+2026-06-01 17:40:21,453 INFO MainGUi: root_function_callback: root_function_callback refresh_voice_write with {}
+2026-06-01 17:40:21,459 INFO DatabaseManager: start_research_session: Started research session 9b8ac31f-48c4-4a5f-a733-478557ba7925 for subject Participante_20260601_174021 
+2026-06-01 17:40:21,470 INFO PageHome: toggle_recording: Research logging session started for Participante_20260601_174021
+2026-06-01 17:40:22,318 INFO VoiceController: _listen_loop: El micrófono escuchó: 'su decisión'
+2026-06-01 17:40:23,161 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 128.19
+2026-06-01 17:40:26,489 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 129.46
+2026-06-01 17:40:29,733 INFO FacialEventManager: __init__: Initializing FacialEventManager singleton
+2026-06-01 17:40:29,817 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 131.86
+2026-06-01 17:40:31,440 INFO MouseController: main_loop: [DIAG] loop=200 raw=(225.2,227.4) vel=(-8.80,-0.50)
+2026-06-01 17:40:33,135 INFO MouseController: main_loop: [DIAG] loop=400 raw=(219.8,205.4) vel=(-0.59,-0.40)
+2026-06-01 17:40:33,145 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 140.37
+2026-06-01 17:40:33,913 INFO VoiceController: _listen_loop: El micrófono escuchó: 'establecido en el art figura claramente en ella es una artista yuri se utiliza para tu equilibrio mr ross'
+2026-06-01 17:40:34,821 INFO MouseController: main_loop: [DIAG] loop=600 raw=(205.0,200.9) vel=(-2.44,-0.93)
+2026-06-01 17:40:36,066 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Raise left eyebrow' (Hold time: 170.5ms)
+2026-06-01 17:40:36,074 INFO MainGUi: root_function_callback: root_function_callback change_page with {'target': 'page_voice'}
+2026-06-01 17:40:36,081 INFO page_home: leave: leave
+2026-06-01 17:40:36,081 INFO page_camera: leave: leave
+2026-06-01 17:40:36,081 INFO page_cursor: leave: leave
+2026-06-01 17:40:36,081 INFO page_gestures: leave: leave
+2026-06-01 17:40:36,081 INFO FrameSelectGesture: leave: leave
+2026-06-01 17:40:36,081 INFO page_keyboard: leave: leave
+2026-06-01 17:40:36,082 INFO FrameSelectKeyboard: leave: leave
+2026-06-01 17:40:36,082 INFO PageVoice: enter: enter
+2026-06-01 17:40:36,084 INFO VoiceController: update_config: VoiceController config updated: {'enabled': True, 'language': 'es-ES', 'microphone_id': 0, 'confidence_threshold': 0.29999999999999993, 'voice_sensitivity': 41, 'auto_type': False, 'confirmation_required': False, 'pause_during_cursor': True, 'speech_timeout_ms': 5000, 'voice_feedback': True}
+2026-06-01 17:40:36,088 INFO PageVoice: load_initial_config: Voice config loaded successfully
+2026-06-01 17:40:36,473 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 140.41
+2026-06-01 17:40:36,500 INFO MouseController: main_loop: [DIAG] loop=800 raw=(204.1,200.7) vel=(-0.53,-0.42)
+2026-06-01 17:40:38,190 INFO MouseController: main_loop: [DIAG] loop=1000 raw=(241.9,190.3) vel=(14.09,2.74)
+2026-06-01 17:40:39,801 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 140.97
+2026-06-01 17:40:39,881 INFO MouseController: main_loop: [DIAG] loop=1200 raw=(232.9,197.9) vel=(3.38,0.12)
+2026-06-01 17:40:41,014 INFO MainGUi: root_function_callback: root_function_callback change_page with {'target': 'page_home'}
+2026-06-01 17:40:41,015 INFO page_home: enter: enter
+2026-06-01 17:40:41,015 INFO page_camera: leave: leave
+2026-06-01 17:40:41,015 INFO page_cursor: leave: leave
+2026-06-01 17:40:41,015 INFO page_gestures: leave: leave
+2026-06-01 17:40:41,015 INFO FrameSelectGesture: leave: leave
+2026-06-01 17:40:41,015 INFO page_keyboard: leave: leave
+2026-06-01 17:40:41,015 INFO FrameSelectKeyboard: leave: leave
+2026-06-01 17:40:41,018 INFO PageVoice: leave: leave
+2026-06-01 17:40:41,563 INFO MouseController: main_loop: [DIAG] loop=1400 raw=(208.9,194.6) vel=(0.39,-0.51)
+2026-06-01 17:40:41,927 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Raise left eyebrow' (Hold time: 167.7ms)
+2026-06-01 17:40:43,113 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 140.24
+2026-06-01 17:40:43,250 INFO MouseController: main_loop: [DIAG] loop=1600 raw=(191.8,188.9) vel=(-8.66,-5.45)
+2026-06-01 17:40:44,263 INFO FacialEventManager: filter_gesture: Anti-Midas Touch passed: Triggering 'Raise left eyebrow' (Hold time: 168.4ms)
+2026-06-01 17:40:44,943 INFO MouseController: main_loop: [DIAG] loop=1800 raw=(225.1,188.0) vel=(19.05,1.19)
+2026-06-01 17:40:45,922 INFO VoiceController: _listen_loop: El micrófono escuchó: 'esta eso nosotros trabajamos bajo el esquema garcía como la barbilla y ojos de ángel'
+2026-06-01 17:40:46,139 INFO root: close_all: Close all
+2026-06-01 17:40:46,140 INFO root: close_all: Auto-ending research session on close_all protocol.
+2026-06-01 17:40:46,145 INFO DatabaseManager: end_research_session: Ended research session 9b8ac31f-48c4-4a5f-a733-478557ba7925
+2026-06-01 17:40:46,145 INFO PageHome: end_active_session: Research logging session ended. Duration: 24.7s
+2026-06-01 17:40:46,148 INFO Pipeline: stop: Stopping Pipeline background thread...
+2026-06-01 17:40:46,445 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 145.75
+2026-06-01 17:40:46,630 INFO MouseController: main_loop: [DIAG] loop=2000 raw=(241.1,196.9) vel=(-0.00,-0.00)
+2026-06-01 17:40:47,151 INFO TaskKiller: exit: Exit program
+2026-06-01 17:40:47,151 INFO CameraManager: destroy: Destroying Threadcamera
+2026-06-01 17:40:47,435 INFO CameraManager: destroy: Threadcamera destroyed
+2026-06-01 17:40:47,447 INFO VoiceController: stop: Stop VoiceController singleton
+2026-06-01 17:40:47,455 INFO root: remove_fonts: Removing font assets/fonts/GoogleSans-Bold.ttf
+2026-06-01 17:40:47,457 INFO root: remove_fonts: Removing font assets/fonts/GoogleSans-Medium.ttf
+2026-06-01 17:40:48,227 INFO root: remove_fonts: Removing font assets/fonts/GoogleSans-Regular.ttf
+2026-06-01 17:40:49,016 INFO root: exit: Kill psutil.Process(pid=16840, name='python.exe', status='running', started='17:39:51'), []
