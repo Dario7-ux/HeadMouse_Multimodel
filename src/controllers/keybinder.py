@@ -138,7 +138,7 @@ class Keybinder(metaclass=Singleton):
                     pydirectinput.keyUp(keysym)
                 self.key_states[state_name] = False
                 self._log_research_event("key_hold_end", keysym)
-        else: # single
+        else: # pulsación única
             if is_triggered:
                 try:
                     pyautogui.press(keysym)

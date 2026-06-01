@@ -493,7 +493,7 @@ class PageKeyboard(SafeDisposableFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(4, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.is_active = False
         self.grid_propagate(False)
@@ -515,26 +515,42 @@ class PageKeyboard(SafeDisposableFrame):
         des_txt = "Selecciona un gesto facial que desees vincular a una tecla específica del teclado. La sensibilidad te permite controlar cuánto tienes que hacer el gesto para activar la pulsación de la tecla"
         des_label = customtkinter.CTkLabel(master=self,
                                            text=des_txt,
-                                           wraplength=300,
+                                           wraplength=350,
                                            justify=tk.LEFT)  #
         des_label.cget("font").configure(size=14)
-        des_label.grid(row=1, column=0, padx=20, pady=(10, 40), sticky="nw")
+        des_label.grid(row=1, column=0, padx=20, pady=(10, 20), sticky="nw")
+
+        # --- Campo de Prueba Directa ---
+        self.test_frame = customtkinter.CTkFrame(master=self, fg_color="transparent")
+        self.test_frame.grid(row=2, column=0, padx=20, pady=(0, 20), sticky="nw")
+
+        self.test_label = customtkinter.CTkLabel(master=self.test_frame,
+                                                 text="👉 Probar aquí:",
+                                                 text_color=TEXT_SECONDARY)
+        self.test_label.cget("font").configure(size=13, weight="bold")
+        self.test_label.pack(side="left", padx=(0, 10))
+
+        self.test_entry = customtkinter.CTkEntry(master=self.test_frame,
+                                                 placeholder_text="Haz clic aquí y abre la boca para probar...",
+                                                 width=250,
+                                                 height=32)
+        self.test_entry.pack(side="left")
 
         # Inner frame
         self.inner_frame = FrameSelectKeyboard(
             self, logger_name="FrameSelectKeyboard")
-        self.inner_frame.grid(row=3, column=0, padx=5, pady=5, sticky="nswe")
+        self.inner_frame.grid(row=4, column=0, padx=5, pady=5, sticky="nswe")
 
-        # Add binding butotn
+        # Add binding button
         self.add_binding_button = customtkinter.CTkButton(
             master=self,
             text="+ Agregar asignación",
             fg_color=BG_CARD,
             text_color=TEXT_ACCENT,
             command=self.inner_frame.add_blank_div)
-        self.add_binding_button.grid(row=2,
+        self.add_binding_button.grid(row=3,
                                      column=0,
-                                     padx=5,
+                                     padx=20,
                                      pady=5,
                                      sticky="nw")
 

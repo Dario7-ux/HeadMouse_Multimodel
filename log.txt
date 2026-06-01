@@ -1,2 +1,54 @@
-2026-06-01 11:37:14,941 ERROR root: <module>: Failed to monkeypatch PIL.Image.open: No module named 'PIL'
-2026-06-01 11:37:14,942 ERROR root: <module>: Failed to monkeypatch cv2.imread: No module named 'cv2'
+2026-06-01 11:44:34,023 INFO root: <module>: Successfully monkeypatched PIL.Image.open
+2026-06-01 11:44:34,114 INFO root: <module>: Successfully monkeypatched cv2.imread
+2026-06-01 11:44:34,976 INFO root: <module>: Starting main app.
+2026-06-01 11:44:34,976 INFO TaskKiller: __init__: Intialize TaskKiller singleton
+2026-06-01 11:44:34,976 INFO root: start: Installing google fonts.
+2026-06-01 11:44:34,976 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Bold.ttf
+2026-06-01 11:44:34,976 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Medium.ttf
+2026-06-01 11:44:34,976 INFO root: install_fonts: Installing font assets/fonts/GoogleSans-Regular.ttf
+2026-06-01 11:44:34,976 INFO ConfigManager: __init__: Intialize ConfigManager singleton
+2026-06-01 11:44:34,976 INFO DatabaseManager: _init_db: Initializing SQLite database at configs\focuzvoz.db
+2026-06-01 11:44:34,979 INFO ConfigManager: _migrate_to_sqlite: Flesystem profiles: ['default', 'profile_1', 'profile_2']. DB profiles: ['default', 'profile_1', 'profile_2']
+2026-06-01 11:44:34,979 INFO ConfigManager: _migrate_to_sqlite: Automatic SQLite database migration check completed.
+2026-06-01 11:44:34,980 INFO ConfigManager: list_profile: Profiles loaded from SQLite: ['default', 'profile_1', 'profile_2']
+2026-06-01 11:44:34,980 INFO ConfigManager: start: Start ConfigManager singleton
+2026-06-01 11:44:34,980 INFO ConfigManager: load_profile: Loading profile from SQLite: default
+2026-06-01 11:44:34,981 INFO CameraManager: __init__: Intialize CameraManager singleton
+2026-06-01 11:44:34,992 INFO CameraManager: start: Start CameraManager singleton
+2026-06-01 11:44:34,992 INFO CameraManager: __init__: Intializing Threadcamera
+2026-06-01 11:44:34,993 INFO ListCamera: __open_camera_task: Try openning camera: 0
+2026-06-01 11:44:34,993 INFO CameraManager: __init__: Found default camera_id None
+2026-06-01 11:44:34,993 INFO CameraManager: read_camera_loop: Threadcamera main_loop started.
+2026-06-01 11:44:34,993 INFO MouseController: __init__: Intialize MouseController singleton
+2026-06-01 11:44:34,993 INFO MouseController: start: Start MouseController singleton
+2026-06-01 11:44:34,994 INFO OneEuroFilter: __init__: OneEuroFilter2D initialized: min_cutoff=2.5, beta=0.015, d_cutoff=1.0
+2026-06-01 11:44:34,994 INFO MouseController: start: 1 Euro Filter initialized for cursor smoothing
+2026-06-01 11:44:34,994 INFO Keybinder: __init__: Intialize Keybinder singleton
+2026-06-01 11:44:34,994 INFO Keybinder: start: Start Keybinder singleton
+2026-06-01 11:44:34,994 INFO FaceMesh: __init__: Intialize FaceMesh singleton
+2026-06-01 11:44:34,994 INFO FaceMesh: start: Start FaceMesh singleton
+2026-06-01 11:44:35,018 INFO VoiceController: __init__: Initialize VoiceController singleton
+2026-06-01 11:44:35,018 INFO VoiceController: start: Start VoiceController singleton
+2026-06-01 11:44:35,050 INFO comtypes.client._code_cache: _create_comtypes_gen_package: Imported existing <module 'comtypes.gen' from 'C:\\Servidores\\Lectura_FocuzVoz\\FocuzVoz2.1\\.venv\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-06-01 11:44:35,050 INFO comtypes.client._code_cache: _find_gen_dir: Using writeable comtypes cache directory: 'C:\Servidores\Lectura_FocuzVoz\FocuzVoz2.1\.venv\Lib\site-packages\comtypes\gen'
+2026-06-01 11:44:35,902 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 0000020E43BD3DB0> height: 480 width: 640
+2026-06-01 11:44:36,154 INFO ListCamera: __open_camera_task: Try openning camera: 1
+2026-06-01 11:44:36,288 INFO ListCamera: __open_camera_task: Camera 1: < cv2.VideoCapture 0000020E46A175D0> height: 480 width: 640
+2026-06-01 11:44:36,306 INFO ListCamera: __open_camera_task: Try openning camera: 2
+2026-06-01 11:44:36,307 WARNING ListCamera: __open_camera_task: Camera 2: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+
+2026-06-01 11:44:36,307 INFO ListCamera: assign_caps_queue: Camera 2: Failed to open
+2026-06-01 11:44:36,308 INFO ListCamera: __open_camera_task: Try openning camera: 3
+2026-06-01 11:44:36,308 WARNING ListCamera: __open_camera_task: Camera 3: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+
+2026-06-01 11:44:36,309 INFO ListCamera: assign_caps_queue: Camera 3: Failed to open
+2026-06-01 11:44:36,309 INFO ListCamera: __open_camera_task: Try openning camera: 4
+2026-06-01 11:44:36,309 WARNING ListCamera: __open_camera_task: Camera 4: not found OpenCV(4.11.0) D:\a\opencv-python\opencv-python\opencv\modules\videoio\src\cap.cpp:517: error: (-215:Assertion failed) api != 0 in function 'cv::VideoCapture::getBackendName'
+
+2026-06-01 11:44:36,309 INFO ListCamera: assign_caps_queue: Camera 4: Failed to open
+2026-06-01 11:44:36,309 INFO CameraManager: assign_done: Assign cameras completed. Found {0: None, 1: None}
+2026-06-01 11:44:36,310 INFO CameraManager: assign_done: Try to use camera 0
+2026-06-01 11:44:36,310 INFO CameraManager: pick_camera: Pick camera 0, Releasing others...
+2026-06-01 11:44:36,311 INFO ListCamera: __open_camera_task: Try openning camera: 0
+2026-06-01 11:44:36,971 INFO ListCamera: __open_camera_task: Camera 0: < cv2.VideoCapture 0000020E58460C50> height: 480 width: 640
+2026-06-01 11:44:43,575 INFO CameraManager: read_camera_loop: [DIAG_CAM] Active camera 0 frame mean brightness: 127.68
