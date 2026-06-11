@@ -10,7 +10,7 @@ from src.singleton_meta import Singleton
 from src.task_killer import TaskKiller
 from src.utils.database import DatabaseManager
 
-VERSION = "0.3.34"
+VERSION = "2.2"
 
 DEFAULT_JSON = Path("configs/default.json")
 BACKUP_PROFILE = Path("configs/default")
