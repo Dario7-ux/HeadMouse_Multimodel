@@ -43,7 +43,7 @@ exe_app = EXE(
     app.scripts,
     [],
     exclude_binaries=True,
-    name='FocuzVoz2.2',
+    name='FocuzVoz',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

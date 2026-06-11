@@ -2,7 +2,7 @@
 [Setup]
 AppId={{C1B79E10-6C2D-4EBD-8B39-44F4E4EF4AC4}}
 AppName=FocuzVoz
-AppVersion=2.1
+AppVersion=2.2
 AppPublisher=Dario7-ux
 DefaultDirName={localappdata}\FocuzVoz
 DisableProgramGroupPage=yes
@@ -20,11 +20,11 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "c:\Servidores\Lectura_FocuzVoz\FocuzVoz2.1\dist\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
+Source: "dist\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\FocuzVoz"; Filename: "{app}\run_app.exe"
-Name: "{autodesktop}\FocuzVoz"; Filename: "{app}\run_app.exe"; Tasks: desktopicon
+Name: "{autoprograms}\FocuzVoz"; Filename: "{app}\FocuzVoz.exe"
+Name: "{autodesktop}\FocuzVoz"; Filename: "{app}\FocuzVoz.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\run_app.exe"; Description: "{cm:LaunchProgram,FocuzVoz}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\FocuzVoz.exe"; Description: "{cm:LaunchProgram,FocuzVoz}"; Flags: nowait postinstall skipifsilent
