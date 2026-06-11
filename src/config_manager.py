@@ -18,6 +18,7 @@ BACKUP_PROFILE = Path("configs/default")
 logger = logging.getLogger("ConfigManager")
 
 
+# pyrefly: ignore [invalid-inheritance]
 class ConfigManager(metaclass=Singleton):
 
     def __init__(self):
