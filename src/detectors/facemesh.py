@@ -33,6 +33,7 @@ class FaceMesh(metaclass=Singleton):
         self.model = None
         self.latest_time_ms = 0
         self.is_started = False
+        self.is_processing = False
 
     def start(self):
         if not self.is_started:
@@ -91,6 +92,7 @@ class FaceMesh(metaclass=Singleton):
         return np.array([x_pixel, y_pixel], np.float32)
 
     def mp_callback(self, mp_result, output_image, timestamp_ms: int):
+        self.is_processing = False
         if len(mp_result.face_landmarks) >= 1 and len(
                 mp_result.face_blendshapes) >= 1:
             self.mp_landmarks = mp_result.face_landmarks[0]
@@ -114,10 +116,14 @@ class FaceMesh(metaclass=Singleton):
 
     def detect_frame(self, frame_np: npt.ArrayLike):
 
+        if self.is_processing:
+            return
+
         t_ms = int(time.time() * 1000)
         if t_ms <= self.latest_time_ms:
             return
 
+        self.is_processing = True
         frame_mp = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_np)
         self.model.detect_async(frame_mp, t_ms)
         self.latest_time_ms = t_ms

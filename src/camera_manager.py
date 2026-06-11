@@ -19,7 +19,7 @@ MAX_SEARCH_CAMS = 5
 
 logger = logging.getLogger("CameraManager")
 
-
+# TODO: verificar que la cámara exista antes de abrirla
 def add_overlay(background, overlay, x, y, width, height):
 
     background_section = background[y:y + height, x:x + width]
@@ -29,7 +29,8 @@ def add_overlay(background, overlay, x, y, width, height):
                                               overlay_section, 0.7, 0)
     return background
 
-
+# TODO: la cámara actual debe ser guardada en un archivo de texto o base de datos para que se pueda recordar cuando se reinicie el programa
+# TODO: los overlays deben ser cargados desde archivos de configuración
 class CameraManager(metaclass=Singleton):
 
     def __init__(self):
@@ -110,7 +111,7 @@ class CameraManager(metaclass=Singleton):
         self.frame_buffers["debug"] = self.frame_buffers["raw"].copy()
 
         # Disabled
-        if not MouseController().is_active.get():
+        if not MouseController()._active_flag.is_set():
             self.frame_buffers["debug"] = add_overlay(
                 self.frame_buffers["debug"], self.overlay_disabled, 0, 0, 640,
                 108)

@@ -14,6 +14,10 @@ def __open_camera_task(i):
     try:
         cap = cv2.VideoCapture(cv2.CAP_DSHOW + i)
 
+        if not cap.isOpened():
+            logger.info(f"Camera {i}: Could not open camera")
+            return (False, i, None)
+
         if cap.getBackendName() != "DSHOW":
             logger.info(f"Camera {i}: {cap.getBackendName()} is not supported")
             return (False, i, None)

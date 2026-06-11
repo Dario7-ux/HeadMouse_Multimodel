@@ -5,6 +5,7 @@ from src.singleton_meta import Singleton
 logger = logging.getLogger("FacialEventManager")
 
 
+# pyrefly: ignore [invalid-inheritance]
 class FacialEventManager(metaclass=Singleton):
     """Procesador de eventos de gestos con estado que implementa la lógica Anti-Midas Touch.
     

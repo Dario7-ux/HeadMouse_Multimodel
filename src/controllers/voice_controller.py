@@ -45,6 +45,7 @@ class VoiceController(metaclass=Singleton):
         self.vosk_model = None
         self.audio_stream = None
         self.p_audio = None
+        self._lock = threading.Lock()
         import queue
         self.tts_queue = queue.Queue()
         self.tts_thread = None
@@ -128,13 +129,9 @@ class VoiceController(metaclass=Singleton):
     def _start_listening_thread(self):
         """Lanza el hilo de escucha en segundo plano para el micrófono."""
         if self._thread is None or not self._thread.is_alive():
-            # Inicializar el modelo de Vosk al iniciar el hilo
-            if self._initialize_vosk_model():
-                self._thread = threading.Thread(target=self._listen_loop, daemon=True)
-                self._thread.start()
-                logger.info("Hilo de fondo para reconocimiento de voz de Vosk lanzado con éxito.")
-            else:
-                logger.error("Error al inicializar el modelo de Vosk. Verifique la ruta de instalación.")
+            self._thread = threading.Thread(target=self._listen_loop, daemon=True)
+            self._thread.start()
+            logger.info("Hilo de fondo para reconocimiento de voz de Vosk lanzado con éxito.")
 
     def _initialize_vosk_model(self) -> bool:
         """Inicializar el modelo de Vosk para el reconocimiento de voz fuera de línea.
@@ -142,31 +139,37 @@ class VoiceController(metaclass=Singleton):
         Returns:
             True si el modelo se cargó correctamente, False en caso contrario.
         """
-        try:
-            if self.vosk_model is None:
-                if not os.path.exists(VOSK_MODEL_PATH):
-                    logger.warning(f"Modelo de Vosk no encontrado en: {VOSK_MODEL_PATH}")
-                    logger.info("Intentando descargar el modelo de Vosk en español...")
+        with self._lock:
+            try:
+                if self.vosk_model is None:
+                    if not os.path.exists(VOSK_MODEL_PATH):
+                        logger.warning(f"Modelo de Vosk no encontrado en: {VOSK_MODEL_PATH}")
+                        logger.info("Intentando descargar el modelo de Vosk en español...")
+                        
+                        from src.utils.vosk_setup import setup_model, download_model_manual
+                        if not setup_model():
+                            logger.error(download_model_manual())
+                            return False
                     
-                    from src.utils.vosk_setup import setup_model, download_model_manual
-                    if not setup_model():
-                        logger.error(download_model_manual())
+                    if not os.path.exists(VOSK_MODEL_PATH):
+                        logger.error(f"El modelo de Vosk sigue sin estar disponible en: {VOSK_MODEL_PATH}")
                         return False
-                
-                if not os.path.exists(VOSK_MODEL_PATH):
-                    logger.error(f"El modelo de Vosk sigue sin estar disponible en: {VOSK_MODEL_PATH}")
-                    return False
-                
-                self.vosk_model = Model(VOSK_MODEL_PATH)
-                logger.info("Modelo de Vosk cargado correctamente (modo fuera de línea - no requiere internet)")
-            return True
-        except Exception as e:
-            logger.error(f"Error al inicializar el modelo de Vosk: {e}")
-            return False
+                    
+                    self.vosk_model = Model(VOSK_MODEL_PATH)
+                    logger.info("Modelo de Vosk cargado correctamente (modo fuera de línea - no requiere internet)")
+                return True
+            except Exception as e:
+                logger.error(f"Error al inicializar el modelo de Vosk: {e}")
+                return False
 
     def _listen_loop(self):
         """Bucle continuo en segundo plano que captura el habla usando Vosk (fuera de línea)."""
         try:
+            # Inicializar el modelo de Vosk en el hilo de fondo
+            if not self._initialize_vosk_model():
+                logger.error("Error al inicializar el modelo de Vosk en el hilo de fondo.")
+                return
+
             # Inicializar PyAudio
             self.p_audio = pyaudio.PyAudio()
             
@@ -329,48 +332,69 @@ class VoiceController(metaclass=Singleton):
             except Exception as e:
                 logger.error(f"Error al registrar la telemetria de voz: {e}")
 
-        # 4. Comandos de CLICS con variantes foneticas que Vosk en espanol puede producir
-        CLICK_VARIANTS = ["click", "clic", "klik", "clik", "clique", "klick", "klic", "klique"]
-        DOUBLE_RIGHT = ["doble click derecho", "doble clic derecho", "doble klik derecho", "doble klick derecho"]
-        DOUBLE_LEFT  = ["doble click izquierdo", "doble clic izquierdo",
-                        "doble click", "doble clic", "doble klik", "doble klick"]
-        RIGHT_CLICK  = ["click derecho", "clic derecho", "klik derecho", "klick derecho"]
+        # 4. Comandos de CLICS con variantes fonéticas que Vosk en español puede producir
+        CLIC_WORDS = ["clic", "click", "cli", "klik", "clik", "clique", "klick", "klic", "klique"]
+        LEFT_WORDS = ["izquierdo", "izquierda", "izquiedo", "izquiero", "izquerda"]
+        DOUBLE_WORDS = ["doble", "dobles", "dobl"]
 
-        if _has_any_substr(norm_text, DOUBLE_RIGHT):
-            pyautogui.click(button="right", clicks=2, interval=0.1)
-            self.speak_confirmation("Doble clic derecho")
-            if self._ui_callback:
-                self._ui_callback("[Comando: Doble clic derecho]")
-            log_custom_event(event_type="double_click", action="voice_double_click_right", is_click=True, click_count=2)
-            return
+        has_clic = any(w in words for w in CLIC_WORDS)
+        has_double = any(w in words for w in DOUBLE_WORDS)
+        has_left = any(w in words for w in LEFT_WORDS)
 
-        elif _has_any_substr(norm_text, DOUBLE_LEFT):
-            pyautogui.click(button="left", clicks=2, interval=0.1)
-            self.speak_confirmation("Doble clic izquierdo")
-            if self._ui_callback:
-                self._ui_callback("[Comando: Doble clic izquierdo]")
-            log_custom_event(event_type="double_click", action="voice_double_click_left", is_click=True, click_count=2)
-            return
-
-        elif _has_any_substr(norm_text, RIGHT_CLICK):
-            pyautogui.click(button="right")
-            self.speak_confirmation("Clic derecho")
-            if self._ui_callback:
-                self._ui_callback("[Comando: Clic derecho]")
-            log_custom_event(event_type="click", action="voice_click_right", is_click=True, click_count=1)
-            return
-
-        elif _has_any_word(norm_text, CLICK_VARIANTS):
-            # Click izquierdo simple: solo si la variante aparece como palabra aislada
-            pyautogui.click(button="left")
-            self.speak_confirmation("Clic izquierdo")
-            if self._ui_callback:
-                self._ui_callback("[Comando: Clic izquierdo]")
-            log_custom_event(event_type="click", action="voice_click_left", is_click=True, click_count=1)
-            return
+        if has_clic:
+            if has_double:
+                if has_left:
+                    # "doble clic izquierdo"
+                    pyautogui.click(button="left", clicks=2, interval=0.1)
+                    self.speak_confirmation("Doble clic izquierdo")
+                    if self._ui_callback:
+                        self._ui_callback("[Comando: Doble clic izquierdo]")
+                    log_custom_event(event_type="double_click", action="voice_double_click_left", is_click=True, click_count=2)
+                    return
+                else:
+                    # "doble clic" -> Doble clic derecho
+                    pyautogui.click(button="right", clicks=2, interval=0.1)
+                    self.speak_confirmation("Doble clic derecho")
+                    if self._ui_callback:
+                        self._ui_callback("[Comando: Doble clic derecho]")
+                    log_custom_event(event_type="double_click", action="voice_double_click_right", is_click=True, click_count=2)
+                    return
+            else:
+                if has_left:
+                    # "clic izquierdo"
+                    pyautogui.click(button="left")
+                    self.speak_confirmation("Clic izquierdo")
+                    if self._ui_callback:
+                        self._ui_callback("[Comando: Clic izquierdo]")
+                    log_custom_event(event_type="click", action="voice_click_left", is_click=True, click_count=1)
+                    return
+                else:
+                    # "clic" (o "cli") -> Clic derecho
+                    pyautogui.click(button="right")
+                    self.speak_confirmation("Clic derecho")
+                    if self._ui_callback:
+                        self._ui_callback("[Comando: Clic derecho]")
+                    log_custom_event(event_type="click", action="voice_click_right", is_click=True, click_count=1)
+                    return
 
         # 5. Comandos para abrir aplicaciones
-        elif norm_text in ["abrir navegador", "abrir internet", "iniciar navegador", "iniciar internet"]:
+        # Analizar verbos de apertura
+        is_open_cmd = any(w in words for w in ["abrir", "abre", "iniciar", "inicia", "abril", "inici", "run", "open"])
+
+        # A. Navegador / Internet
+        is_nav_term = any(w in words for w in ["navegador", "internet", "chrome", "google", "explorador", "web", "browser"])
+        
+        # B. Word
+        is_word_term = any(w in words for w in [
+            "word", "uord", "wor", "board", "work", "guor", "por", "words", "works",
+            "guord", "uort", "wort", "guort", "huor", "huort", "vuor", "vuort", "gor",
+            "gort", "glor", "gual", "guol", "ver", "vor", "bor", "bord", "uard", "guard"
+        ])
+        
+        # C. Bloc de notas / Notepad
+        is_notepad_term = any(w in words for w in ["notas", "nota", "notepad", "bloc", "notpad", "blocnotas"])
+
+        if is_open_cmd and is_nav_term:
             import os as _os
             try:
                 _os.startfile("https://www.google.com")
@@ -380,31 +404,31 @@ class VoiceController(metaclass=Singleton):
             self.speak_confirmation("Abriendo navegador")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Navegador]")
-            log_custom_event(event_type="voice_command", action="launch_browser", extra_voice_text=norm_text)
+            log_custom_event(event_type="voice_command", action="launch_browser", extra_voice_text="abrir internet")
             return
 
-        elif norm_text in ["abrir word", "iniciar word", "abrir microsoft word"]:
-            import os as _os, subprocess as _sp
+        elif is_open_cmd and is_word_term and not is_notepad_term:
+            import subprocess as _sp
             try:
-                _os.startfile("winword.exe")
-            except Exception:
-                try:
-                    _sp.Popen("start winword", shell=True)
-                except Exception as e:
-                    logger.error(f"Error launching Word: {e}")
+                _sp.Popen("cmd.exe /c start winword", shell=True, creationflags=_sp.CREATE_NO_WINDOW)
+            except Exception as e:
+                logger.error(f"Error launching Word: {e}")
             self.speak_confirmation("Abriendo Word")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Word]")
-            log_custom_event(event_type="voice_command", action="launch_word", extra_voice_text=norm_text)
+            log_custom_event(event_type="voice_command", action="launch_word", extra_voice_text="abrir word")
             return
 
-        elif norm_text in ["abrir bloc de notas", "abrir notas", "abrir notepad", "iniciar bloc de notas"]:
+        elif is_open_cmd and is_notepad_term:
             import subprocess as _sp
-            _sp.Popen("notepad.exe")
+            try:
+                _sp.Popen("notepad.exe")
+            except Exception as e:
+                logger.error(f"Error launching Notepad: {e}")
             self.speak_confirmation("Abriendo bloc de notas")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Notas]")
-            log_custom_event(event_type="voice_command", action="launch_notepad", extra_voice_text=norm_text)
+            log_custom_event(event_type="voice_command", action="launch_notepad", extra_voice_text="abrir bloc de notas")
             return
 
         # 6. Leer auto_type directamente de ConfigManager para evitar desync de config
@@ -498,14 +522,39 @@ class VoiceController(metaclass=Singleton):
 
     def update_config(self, config: dict):
         """Actualizar la configuración e iniciar/detener el hilo de fondo en consecuencia."""
+        old_enabled = self.is_enabled()
+        old_mic_id = self.config.get("microphone_id", 0) if self.config else None
+        
         self.config = config
         logger.info(f"VoiceController config updated: {config}")
         
         if self.is_active:
-            if self.is_enabled():
-                self._start_listening_thread()
+            new_enabled = self.is_enabled()
+            new_mic_id = self.config.get("microphone_id", 0)
+            
+            if not new_enabled:
+                if self._thread is not None:
+                    logger.info("Voice recognition disabled. Stopping listening thread...")
+                    self.is_active = False  # Temporarily set to False to stop the loop
+                    # Wait for thread to finish
+                    if self._thread.is_alive():
+                        self._thread.join(timeout=1.0)
+                    self._cleanup_audio()
+                    self._thread = None
+                    self.is_active = True  # Restore
             else:
-                self._thread = None
+                # Restart if microphone changed, or if was previously disabled, or thread died
+                if not old_enabled or (old_mic_id is not None and old_mic_id != new_mic_id) or self._thread is None or not self._thread.is_alive():
+                    logger.info("Restarting listening thread due to config change...")
+                    if self._thread is not None:
+                        self.is_active = False
+                        if self._thread.is_alive():
+                            self._thread.join(timeout=1.0)
+                        self._cleanup_audio()
+                        self._thread = None
+                        self.is_active = True
+                    
+                    self._start_listening_thread()
 
     def type_text(self, text: str):
         """Escribir texto carácter por carácter utilizando simulación de teclado.

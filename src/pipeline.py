@@ -40,13 +40,13 @@ class Pipeline:
             except Exception as e:
                 logger.error(f"Error in pipeline background loop: {e}", exc_info=e)
             
-            # Maintain a target frame rate of 30 FPS (~33ms) to synchronize with webcam
+            # Mantener una tasa de 15 FPS (~66ms) (30 frames por cada 2 segundos) para ahorrar procesamiento
             elapsed = time.time() - start_time
-            sleep_time = max(0.005, 0.033 - elapsed)
+            sleep_time = max(0.005, 0.066 - elapsed)
             time.sleep(sleep_time)
 
     def pipeline_tick(self) -> None:
-        frame_rgb = CameraManager().get_raw_frame()
+        frame_rgb = CameraManager().get_raw_frame() 
         if frame_rgb is None:
             return
 

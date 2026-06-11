@@ -40,17 +40,26 @@ class Keybinder(metaclass=Singleton):
             self.monitors = self.get_monitors()
             self.is_started = True
 
+    def get_combined_bindings(self):
+        # Devuelve una lista de todos los bindings, permitiendo múltiples acciones por gesto
+        bindings = []
+        for shape, v in ConfigManager().mouse_bindings.items():
+            bindings.append((shape, v))
+        for shape, v in ConfigManager().keyboard_bindings.items():
+            bindings.append((shape, v))
+        return bindings
+
     def init_states(self) -> None:
         """Reinicializa el estado del keybinder si se añaden nuevas asignaciones de teclas."""
         # Mantener los estados de todas las teclas registradas
         self.key_states = {}
-        for _, v in (ConfigManager().mouse_bindings |
-                     ConfigManager().keyboard_bindings).items():
+        for shape, v in self.get_combined_bindings():
             self.key_states[v[0] + "_" + v[1]] = False
         self.key_states["holding"] = False
-        self.last_know_keybinds = copy.deepcopy(
-            (ConfigManager().mouse_bindings |
-             ConfigManager().keyboard_bindings))
+        
+        # Guardar copias separadas para detectar cambios
+        self.last_know_keybinds = (copy.deepcopy(ConfigManager().mouse_bindings), 
+                                   copy.deepcopy(ConfigManager().keyboard_bindings))
 
     def get_monitors(self) -> list[dict]:
         out_list = []
@@ -76,7 +85,7 @@ class Keybinder(metaclass=Singleton):
                 return mon_id
         return 0
 
-    def mouse_action(self, is_triggered, is_stable_active, action, mode) -> None:
+    def mouse_action(self, is_triggered, is_stable_active, action, mode, shape_name=None) -> None:
         state_name = "mouse_" + action
 
         if mode == "hold":
@@ -85,13 +94,13 @@ class Keybinder(metaclass=Singleton):
                 self.key_states[state_name] = True
                 
                 # Notificar a la sesión de investigación (si está activa)
-                self._log_research_event("click_hold_start", action)
+                self._log_research_event("click_hold_start", shape_name or action)
                 
             elif (not is_stable_active) and (self.key_states[state_name] is True):
                 pydirectinput.mouseUp(button=action)
                 self.key_states[state_name] = False
                 
-                self._log_research_event("click_hold_end", action)
+                self._log_research_event("click_hold_end", shape_name or action)
 
         elif mode == "single":
             if is_triggered:
@@ -100,7 +109,7 @@ class Keybinder(metaclass=Singleton):
                 self.key_states[state_name] = True
                 
                 # Notificar a la sesión de investigación
-                self._log_research_event("click", action)
+                self._log_research_event("click", shape_name or action)
 
                 if not self.holding and (
                     ((time.time() - self.start_hold_ts) * 1000) >=
@@ -127,7 +136,7 @@ class Keybinder(metaclass=Singleton):
         "numlock": "numlock",
     }
 
-    def keyboard_action(self, is_triggered, is_stable_active, keysym, mode):
+    def keyboard_action(self, is_triggered, is_stable_active, keysym, mode, shape_name=None):
         keysym = keysym.lower()
         state_name = "keyboard_" + keysym
 
@@ -146,7 +155,7 @@ class Keybinder(metaclass=Singleton):
                     except Exception as e:
                         logger.warning(f"keyDown fallido para '{keysym}' / '{pdi_keysym}': {e}")
                 self.key_states[state_name] = True
-                self._log_research_event("key_hold_start", keysym)
+                self._log_research_event("key_hold_start", shape_name or keysym)
             elif (not is_stable_active) and (self.key_states[state_name] is True):
                 try:
                     pyautogui.keyUp(keysym)
@@ -156,7 +165,7 @@ class Keybinder(metaclass=Singleton):
                     except Exception as e:
                         logger.warning(f"keyUp fallido para '{keysym}' / '{pdi_keysym}': {e}")
                 self.key_states[state_name] = False
-                self._log_research_event("key_hold_end", keysym)
+                self._log_research_event("key_hold_end", shape_name or keysym)
         else:  # Pulsacion unica (single)
             if is_triggered:
                 success = False
@@ -172,9 +181,9 @@ class Keybinder(metaclass=Singleton):
                     except Exception as e:
                         logger.warning(f"press fallido para '{keysym}' / '{pdi_keysym}': {e}")
                 if success:
-                    self._log_research_event("keystroke", keysym)
+                    self._log_research_event("keystroke", shape_name or keysym)
 
-    def _log_research_event(self, event_type: str, action: str):
+    def _log_research_event(self, event_type: str, gesture_name: str):
         """Registra eventos de activación de acciones en la sesión de investigación activa."""
         try:
             from src.gui.pages.page_home import PageHome
@@ -184,7 +193,7 @@ class Keybinder(metaclass=Singleton):
                 DatabaseManager().log_research_event(
                     session_id=home_page.session_id,
                     event_type=event_type,
-                    gesture_name=action,
+                    gesture_name=gesture_name,
                     cursor_x=x,
                     cursor_y=y
                 )
@@ -209,14 +218,13 @@ class Keybinder(metaclass=Singleton):
         if blendshape_values is None:
             return
 
-        if (ConfigManager().mouse_bindings |
+        if (ConfigManager().mouse_bindings,
                 ConfigManager().keyboard_bindings) != self.last_know_keybinds:
             self.init_states()
 
         event_manager = FacialEventManager()
 
-        for shape_name, v in (ConfigManager().mouse_bindings |
-                              ConfigManager().keyboard_bindings).items():
+        for shape_name, v in self.get_combined_bindings():
             if shape_name not in shape_list.blendshape_names:
                 continue
             device, action, thres, mode = v
@@ -225,9 +233,12 @@ class Keybinder(metaclass=Singleton):
             idx = shape_list.blendshape_indices[shape_name]
             val = blendshape_values[idx]
 
+            # Crear un identificador de estado único para cada vinculación específica
+            state_id = f"{shape_name}_{device}_{action}"
+
             # Filtrar el gesto usando el FacialEventManager con estado (Anti-Midas Touch)
-            is_triggered = event_manager.filter_gesture(shape_name, val, thres)
-            is_stable_active = event_manager.get_gesture_state(shape_name)["is_active"]
+            is_triggered = event_manager.filter_gesture(state_id, val, thres)
+            is_stable_active = event_manager.get_gesture_state(state_id)["is_active"]
 
             if (device == "mouse") and (action == "pause"):
                 state_name = "mouse_" + action
@@ -235,7 +246,7 @@ class Keybinder(metaclass=Singleton):
                 if is_triggered and (self.key_states[state_name] is False):
                     MouseController().toggle_active(track_loc)
                     self.key_states[state_name] = True
-                    self._log_research_event("pause_toggle", "pause")
+                    self._log_research_event("pause_toggle", shape_name)
                 elif (not is_stable_active) and (self.key_states[state_name] is True):
                     self.key_states[state_name] = False
 
@@ -254,7 +265,7 @@ class Keybinder(metaclass=Singleton):
                                 self.monitors[mon_id]["center_x"],
                                 self.monitors[mon_id]["center_y"])
                             self.key_states[state_name] = True
-                            self._log_research_event("reset_position", "reset")
+                            self._log_research_event("reset_position", shape_name)
                         elif (not is_stable_active) and (self.key_states[state_name] is True):
                             self.key_states[state_name] = False
 
@@ -267,15 +278,15 @@ class Keybinder(metaclass=Singleton):
                                 self.monitors[next_mon_id]["center_x"],
                                 self.monitors[next_mon_id]["center_y"])
                             self.key_states[state_name] = True
-                            self._log_research_event("cycle_monitor", "cycle")
+                            self._log_research_event("cycle_monitor", shape_name)
                         elif (not is_stable_active) and (self.key_states[state_name] is True):
                             self.key_states[state_name] = False
 
                     else:
-                        self.mouse_action(is_triggered, is_stable_active, action, mode)
+                        self.mouse_action(is_triggered, is_stable_active, action, mode, shape_name)
 
                 elif device == "keyboard":
-                    self.keyboard_action(is_triggered, is_stable_active, action, mode)
+                    self.keyboard_action(is_triggered, is_stable_active, action, mode, shape_name)
 
     def destroy(self):
         """Destruir el keybinder."""

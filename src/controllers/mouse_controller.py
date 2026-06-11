@@ -46,6 +46,11 @@ class MouseController(metaclass=Singleton):
         self._active_flag = threading.Event()
         # Variable Tkinter para enlace de UI (usar únicamente desde el hilo principal)
         self.is_active = None
+        # Métricas de sesión acumuladas
+        self._total_distance_px: float = 0.0
+        self._session_start_time: float = 0.0
+        self._active_seconds: float = 0.0
+        self._active_tick_start: float = 0.0
 
     def start(self):
         if not self.is_started:
@@ -75,6 +80,11 @@ class MouseController(metaclass=Singleton):
                 self._active_flag.set()
 
             self.stop_flag = threading.Event()
+            # Iniciar contadores de sesión
+            self._total_distance_px = 0.0
+            self._session_start_time = time.time()
+            self._active_seconds = 0.0
+            self._active_tick_start = time.time() if auto_play else 0.0
             self.pool.submit(self.main_loop)
             self.is_started = True
 
@@ -173,27 +183,66 @@ class MouseController(metaclass=Singleton):
             # pydirectinput no está funcionando aquí
             pyautogui.move(xOffset=vel_x, yOffset=vel_y)
 
+            # Acumular distancia recorrida (módulo del vector de velocidad aplicado)
+            self._total_distance_px += (vel_x ** 2 + vel_y ** 2) ** 0.5
+
             time.sleep(config["tick_interval_ms"] / 1000)
 
     def set_active(self, flag: bool, track_loc=None) -> None:
+        curr_state = self._active_flag.is_set()
+        if curr_state != flag:
+            if curr_state and self._active_tick_start > 0:
+                self._active_seconds += time.time() - self._active_tick_start
+                self._active_tick_start = 0.0
+            elif not curr_state:
+                self._active_tick_start = time.time()
+
         # Actualizar la bandera segura para hilos
         if flag:
             self._active_flag.set()
         else:
             self._active_flag.clear()
-        # Actualizar la variable de tkinter (para el interruptor de la UI)
         if self.is_active is not None:
-            self.is_active.set(flag)
+            try:
+                self.is_active.set(flag)
+            except RuntimeError:
+                try:
+                    from src.gui.pages.page_home import PageHome
+                    page = PageHome.get_instance()
+                    if page:
+                        page.after(0, lambda: self.is_active.set(flag))
+                except Exception:
+                    pass
+                logger.warning("Failed to update tk.BooleanVar synchronously, deferred to main thread.")
+                
         if flag and track_loc is not None:
             self.reset_buffer(track_loc)
 
     def toggle_active(self, track_loc=None):
-        logging.info("Toggle active")
         curr_state = self._active_flag.is_set()
+        logger.info(f"Toggle active called! Changing state from {curr_state} to {not curr_state}")
         self.set_active(not curr_state, track_loc)
+
+    def get_session_stats(self) -> dict:
+        """Devuelve las métricas acumuladas de la sesión actual."""
+        # Si está activo, incluir el tiempo activo actual
+        active_secs = self._active_seconds
+        if self._active_flag.is_set() and self._active_tick_start > 0:
+            active_secs += time.time() - self._active_tick_start
+        # Duración total de la sesión (activo + pausado)
+        total_secs = time.time() - self._session_start_time if self._session_start_time > 0 else 0.0
+        return {
+            "total_distance_px": round(self._total_distance_px, 2),
+            "active_duration_seconds": round(active_secs, 2),
+            "total_session_seconds": round(total_secs, 2),
+        }
 
     def destroy(self):
         self._active_flag.clear()
+        # Acumular tiempo activo final
+        if self._active_tick_start > 0:
+            self._active_seconds += time.time() - self._active_tick_start
+            self._active_tick_start = 0.0
         if self.is_active is not None:
             self.is_active.set(False)
         if self.stop_flag is not None:

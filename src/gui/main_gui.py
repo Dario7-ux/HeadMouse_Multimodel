@@ -5,6 +5,7 @@ import customtkinter
 
 import src.gui.frames as frames
 import src.gui.pages as pages
+from src.gui.bot_overlay import BotOverlay
 from src.config_manager import ConfigManager
 from src.controllers import MouseController
 from src.utils import get_resource_path
@@ -16,17 +17,26 @@ logger = logging.getLogger("MainGUi")
 
 
 class MainGui():
-
     def __init__(self, tk_root):
         logger.info("Init MainGui")
         super().__init__()
         self.tk_root = tk_root
 
-        self.tk_root.geometry("1100x780")
+        # Get screen dimensions dynamically to occupy the entire screen space
+        screen_width = self.tk_root.winfo_screenwidth()
+        screen_height = self.tk_root.winfo_screenheight()
+        
+        self.tk_root.geometry(f"{screen_width}x{screen_height}+0+0")
         self.tk_root.title(f"FocuzVoz {ConfigManager().version}")
         self.tk_root.iconbitmap(get_resource_path("assets/images/icon.ico"))
         self.tk_root.resizable(width=True, height=True)
-        self.tk_root.minsize(1024, 700)
+        # Use a safe minsize that fits 768p and 800p screens
+        self.tk_root.minsize(960, 640)
+        
+        try:
+            self.tk_root.state("zoomed")
+        except Exception:
+            pass
 
         self.tk_root.grid_rowconfigure(1, weight=1)
         self.tk_root.grid_columnconfigure(1, weight=1)
@@ -132,6 +142,9 @@ class MainGui():
         self.theme_btn.place(relx=1.0, rely=0.0, anchor="ne", x=-20, y=20)
         self.theme_btn.lift()
 
+        # Bot Overlay
+        self.bot_overlay = BotOverlay()
+
     def toggle_theme(self):
         """Alterna entre el modo de apariencia claro y oscuro."""
         current = customtkinter.get_appearance_mode()
@@ -230,6 +243,9 @@ class MainGui():
         for page in self.pages.values():
             page.leave()
             page.destroy()
+
+        if hasattr(self, 'bot_overlay'):
+            self.bot_overlay.destroy()
 
         self.tk_root.quit()
         self.tk_root.destroy()

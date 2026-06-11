@@ -1,5 +1,3 @@
-"""Vosk model setup utility for offline Spanish speech recognition."""
-
 import os
 import logging
 import zipfile

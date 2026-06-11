@@ -11,18 +11,40 @@ from src.gui.frames.safe_disposable_frame import SafeDisposableFrame
 logger = logging.getLogger("PageVoice")
 
 
+def get_available_microphones():
+    import pyaudio
+    p = pyaudio.PyAudio()
+    devices = []
+    try:
+        for i in range(p.get_device_count()):
+            try:
+                info = p.get_device_info_by_index(i)
+                if info.get('maxInputChannels', 0) > 0:
+                    name = info.get('name')
+                    devices.append((i, f"{i}: {name}"))
+            except Exception:
+                pass
+    except Exception:
+        pass
+    finally:
+        p.terminate()
+    return devices
+
+
 class PageVoice(SafeDisposableFrame):
 
     def __init__(self, master, root_callback: callable, **kwargs):
         super().__init__(master, **kwargs)
         logger.info("Create PageVoice")
 
-        self.grid_rowconfigure(10, weight=1)
+        self.grid_rowconfigure(12, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
         self.config_manager = ConfigManager()
         self.voice_controller = VoiceController()
         self.root_callback = root_callback
+
+        self.mic_list = get_available_microphones()
 
         # Título
         title_label = customtkinter.CTkLabel(
@@ -47,9 +69,22 @@ class PageVoice(SafeDisposableFrame):
             command=self._on_enable_change)
         self.enable_switch.grid(row=1, column=1, padx=20, pady=10, sticky="ne")
 
+        # Selección de micrófono
+        mic_label = customtkinter.CTkLabel(master=self, text="Micrófono:")
+        mic_label.grid(row=2, column=0, padx=20, pady=10, sticky="nw")
+
+        mic_names = [name for _, name in self.mic_list]
+        self.mic_var = tkinter.StringVar()
+        self.mic_menu = customtkinter.CTkComboBox(
+            master=self,
+            values=mic_names if mic_names else ["No se detectaron micrófonos"],
+            variable=self.mic_var,
+            command=self._on_mic_change)
+        self.mic_menu.grid(row=2, column=1, padx=20, pady=10, sticky="we")
+
         # Selección de idioma
         lang_label = customtkinter.CTkLabel(master=self, text="Idioma:")
-        lang_label.grid(row=2, column=0, padx=20, pady=10, sticky="nw")
+        lang_label.grid(row=3, column=0, padx=20, pady=10, sticky="nw")
 
         self.language_var = tkinter.StringVar()
         self.language_menu = customtkinter.CTkComboBox(
@@ -57,12 +92,12 @@ class PageVoice(SafeDisposableFrame):
             values=["es-ES", "en-US", "en-GB", "fr-FR"],
             variable=self.language_var,
             command=self._on_language_change)
-        self.language_menu.grid(row=2, column=1, padx=20, pady=10, sticky="we")
+        self.language_menu.grid(row=3, column=1, padx=20, pady=10, sticky="we")
 
         # Deslizador de sensibilidad del micrófono
         sens_label = customtkinter.CTkLabel(
             master=self, text="Sensibilidad de micrófono:")
-        sens_label.grid(row=3, column=0, padx=20, pady=10, sticky="nw")
+        sens_label.grid(row=4, column=0, padx=20, pady=10, sticky="nw")
 
         self.sensitivity_var = tkinter.DoubleVar()
         self.sensitivity_slider = customtkinter.CTkSlider(
@@ -71,16 +106,16 @@ class PageVoice(SafeDisposableFrame):
             to=100,
             variable=self.sensitivity_var,
             command=self._on_sensitivity_change)
-        self.sensitivity_slider.grid(row=3, column=1, padx=20, pady=10, sticky="we")
+        self.sensitivity_slider.grid(row=4, column=1, padx=20, pady=10, sticky="we")
 
         self.sensitivity_value = customtkinter.CTkLabel(
             master=self, text="50%", text_color="gray")
-        self.sensitivity_value.grid(row=3, column=1, padx=20, pady=10, sticky="e")
+        self.sensitivity_value.grid(row=4, column=1, padx=20, pady=10, sticky="e")
 
         # Umbral de confianza
         conf_label = customtkinter.CTkLabel(
             master=self, text="Umbral de confianza:")
-        conf_label.grid(row=4, column=0, padx=20, pady=10, sticky="nw")
+        conf_label.grid(row=5, column=0, padx=20, pady=10, sticky="nw")
 
         self.confidence_var = tkinter.DoubleVar()
         self.confidence_slider = customtkinter.CTkSlider(
@@ -90,28 +125,28 @@ class PageVoice(SafeDisposableFrame):
             number_of_steps=10,
             variable=self.confidence_var,
             command=self._on_confidence_change)
-        self.confidence_slider.grid(row=4, column=1, padx=20, pady=10, sticky="we")
+        self.confidence_slider.grid(row=5, column=1, padx=20, pady=10, sticky="we")
 
         self.confidence_value = customtkinter.CTkLabel(
             master=self, text="0.5", text_color="gray")
-        self.confidence_value.grid(row=4, column=1, padx=20, pady=10, sticky="e")
+        self.confidence_value.grid(row=5, column=1, padx=20, pady=10, sticky="e")
 
         # Opción de escritura automática
         auto_type_label = customtkinter.CTkLabel(
             master=self, text="Escribir automáticamente:")
-        auto_type_label.grid(row=5, column=0, padx=20, pady=10, sticky="nw")
+        auto_type_label.grid(row=6, column=0, padx=20, pady=10, sticky="nw")
 
         self.auto_type_var = tkinter.BooleanVar()
         self.auto_type_switch = customtkinter.CTkSwitch(
             master=self,
             variable=self.auto_type_var,
             command=self._on_auto_type_change)
-        self.auto_type_switch.grid(row=5, column=1, padx=20, pady=10, sticky="ne")
+        self.auto_type_switch.grid(row=6, column=1, padx=20, pady=10, sticky="ne")
 
         # Activación por palabra clave (Hotword)
         hotword_label = customtkinter.CTkLabel(
             master=self, text="Palabra clave para activar/desactivar escritura:")
-        hotword_label.grid(row=6, column=0, padx=20, pady=10, sticky="nw")
+        hotword_label.grid(row=7, column=0, padx=20, pady=10, sticky="nw")
 
         self.hotword_var = tkinter.StringVar()
         self.hotword_entry = customtkinter.CTkEntry(
@@ -120,46 +155,46 @@ class PageVoice(SafeDisposableFrame):
             textvariable=self.hotword_var,
             placeholder_text="Ej: focuz"
         )
-        self.hotword_entry.grid(row=6, column=1, padx=20, pady=10, sticky="ne")
+        self.hotword_entry.grid(row=7, column=1, padx=20, pady=10, sticky="ne")
         self.hotword_entry.bind("<KeyRelease>", self._on_hotword_change)
 
         # Requerir confirmación
         confirm_label = customtkinter.CTkLabel(
             master=self,
             text="Requerir confirmación antes de escribir:")
-        confirm_label.grid(row=7, column=0, padx=20, pady=10, sticky="nw")
+        confirm_label.grid(row=8, column=0, padx=20, pady=10, sticky="nw")
 
         self.confirm_var = tkinter.BooleanVar()
         self.confirm_switch = customtkinter.CTkSwitch(
             master=self,
             variable=self.confirm_var,
             command=self._on_confirm_change)
-        self.confirm_switch.grid(row=7, column=1, padx=20, pady=10, sticky="ne")
+        self.confirm_switch.grid(row=8, column=1, padx=20, pady=10, sticky="ne")
 
         # Retroalimentación de voz
         feedback_label = customtkinter.CTkLabel(
             master=self, text="Retroalimentación de voz:")
-        feedback_label.grid(row=8, column=0, padx=20, pady=10, sticky="nw")
+        feedback_label.grid(row=9, column=0, padx=20, pady=10, sticky="nw")
 
         self.feedback_var = tkinter.BooleanVar()
         self.feedback_switch = customtkinter.CTkSwitch(
             master=self,
             variable=self.feedback_var,
             command=self._on_feedback_change)
-        self.feedback_switch.grid(row=8, column=1, padx=20, pady=10, sticky="ne")
+        self.feedback_switch.grid(row=9, column=1, padx=20, pady=10, sticky="ne")
 
         # Botón de prueba
         test_btn = customtkinter.CTkButton(
             master=self,
             text="Probar Micrófono",
             command=self._test_microphone)
-        test_btn.grid(row=9, column=0, padx=20, pady=20, sticky="ew", columnspan=2)
+        test_btn.grid(row=10, column=0, padx=20, pady=20, sticky="ew", columnspan=2)
 
         self.test_result_label = customtkinter.CTkLabel(
             master=self, text="", text_color="gray")
-        self.test_result_label.grid(row=10, column=0, padx=20, pady=5, sticky="ew", columnspan=2)
+        self.test_result_label.grid(row=11, column=0, padx=20, pady=5, sticky="ew", columnspan=2)
 
-        self.grid_rowconfigure(11, weight=1)
+        self.grid_rowconfigure(12, weight=1)
 
         self.load_initial_config()
 
@@ -178,6 +213,19 @@ class PageVoice(SafeDisposableFrame):
             self.feedback_var.set(config.get("voice_feedback", True))
             self.hotword_var.set(config.get("hotword", "focuz"))
 
+            # Seleccionar el micrófono guardado
+            mic_id = config.get("microphone_id", 0)
+            matched_name = f"{mic_id}:"
+            for _, name in self.mic_list:
+                if name.startswith(matched_name):
+                    self.mic_var.set(name)
+                    break
+            else:
+                if self.mic_list:
+                    self.mic_var.set(self.mic_list[0][1])
+                else:
+                    self.mic_var.set("No hay micrófonos disponibles")
+
             self._update_display_values()
             logger.info("Voice config loaded successfully")
         except Exception as e:
@@ -189,6 +237,15 @@ class PageVoice(SafeDisposableFrame):
             text=f"{int(self.sensitivity_var.get())}%")
         self.confidence_value.configure(
             text=f"{self.confidence_var.get():.1f}")
+
+    def _on_mic_change(self, value):
+        """Maneja el cambio de micrófono."""
+        try:
+            mic_id = int(value.split(":")[0])
+            self.config_manager.update_voice_config({"microphone_id": mic_id})
+            logger.info(f"Microphone changed to: {value} (ID: {mic_id})")
+        except Exception as e:
+            logger.error(f"Error changing microphone: {e}")
 
     def _on_enable_change(self):
         """Maneja la activación/desactivación del interruptor."""
@@ -246,21 +303,51 @@ class PageVoice(SafeDisposableFrame):
         logger.info(f"Voice feedback: {self.feedback_var.get()}")
 
     def _test_microphone(self):
-        """Prueba la conexión del micrófono."""
+        """Prueba la conexión del micrófono seleccionado intentando leer un bloque de audio."""
         self.test_result_label.configure(text="Probando micrófono...", text_color="yellow")
         self.update()
         
+        import pyaudio
+        p = pyaudio.PyAudio()
+        stream = None
         try:
-            # Prueba simple: verificar si el dispositivo de audio está disponible
-            logger.info("Microphone test started")
-            self.test_result_label.configure(
-                text="✓ Micrófono detectado correctamente",
-                text_color="green")
+            # Parse selected mic id
+            selected_display = self.mic_var.get()
+            mic_id = 0
+            if selected_display and ":" in selected_display:
+                mic_id = int(selected_display.split(":")[0])
+                
+            stream = p.open(
+                format=pyaudio.paInt16,
+                channels=1,
+                rate=16000,
+                input=True,
+                input_device_index=mic_id,
+                frames_per_buffer=1024
+            )
+            # Try to read audio data
+            data = stream.read(1024, exception_on_overflow=False)
+            if len(data) > 0:
+                self.test_result_label.configure(
+                    text=f"✓ Micrófono funcionando correctamente (Audio recibido de {selected_display})",
+                    text_color="green")
+            else:
+                self.test_result_label.configure(
+                    text="✗ Micrófono abrió pero no devolvió datos.",
+                    text_color="red")
         except Exception as e:
             logger.error(f"Microphone test failed: {e}")
             self.test_result_label.configure(
                 text=f"✗ Error en micrófono: {str(e)}",
                 text_color="red")
+        finally:
+            if stream:
+                try:
+                    stream.stop_stream()
+                    stream.close()
+                except Exception:
+                    pass
+            p.terminate()
 
     def enter(self):
         """Se llama al entrar en la página."""

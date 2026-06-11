@@ -106,13 +106,73 @@ class DatabaseManager:
             except sqlite3.OperationalError:
                 pass
 
-            # 6. Tabla de Eventos de Investigación
+            # 6. Tabla de Eventos de Investigación (General/Fallback)
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS research_events (
                     event_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     session_id TEXT NOT NULL,
                     timestamp TEXT NOT NULL,
                     event_type TEXT NOT NULL, -- 'mouse_move', 'click', 'keystroke', 'voice_command', etc.
+                    gesture_name TEXT,
+                    blendshape_value REAL,
+                    cursor_x REAL,
+                    cursor_y REAL,
+                    dwell_time_ms REAL,
+                    voice_text TEXT,
+                    voice_confidence REAL,
+                    voice_success INTEGER,
+                    voice_duration_ms REAL,
+                    FOREIGN KEY (session_id) REFERENCES research_sessions(session_id) ON DELETE CASCADE
+                );
+            """)
+
+            # 7. Tabla de Guiños (Cejas / Ojos)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS research_events_wink (
+                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    gesture_name TEXT,
+                    blendshape_value REAL,
+                    cursor_x REAL,
+                    cursor_y REAL,
+                    dwell_time_ms REAL,
+                    voice_text TEXT,
+                    voice_confidence REAL,
+                    voice_success INTEGER,
+                    voice_duration_ms REAL,
+                    FOREIGN KEY (session_id) REFERENCES research_sessions(session_id) ON DELETE CASCADE
+                );
+            """)
+
+            # 8. Tabla de Muecas (Movimientos de boca/labios)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS research_events_smirk (
+                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    gesture_name TEXT,
+                    blendshape_value REAL,
+                    cursor_x REAL,
+                    cursor_y REAL,
+                    dwell_time_ms REAL,
+                    voice_text TEXT,
+                    voice_confidence REAL,
+                    voice_success INTEGER,
+                    voice_duration_ms REAL,
+                    FOREIGN KEY (session_id) REFERENCES research_sessions(session_id) ON DELETE CASCADE
+                );
+            """)
+
+            # 9. Tabla de Abrir la Boca (Mandíbula)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS research_events_mouth_open (
+                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
                     gesture_name TEXT,
                     blendshape_value REAL,
                     cursor_x REAL,
@@ -279,9 +339,40 @@ class DatabaseManager:
                            dwell_time_ms: float = None, voice_text: str = None, voice_confidence: float = None,
                            voice_success: int = None, voice_duration_ms: float = None):
         timestamp = datetime.now().isoformat()
+        
+        target_table = "research_events"
+        
+        if event_type == "voice_command" and voice_text:
+            import re
+            clean_cmd = re.sub(r'[^a-zA-Z0-9]', '_', voice_text.lower().strip())
+            target_table = f"research_events_voice_{clean_cmd}"
+        elif gesture_name:
+            import re
+            clean_gesture = re.sub(r'[^a-zA-Z0-9]', '_', gesture_name.lower().strip())
+            target_table = f"research_events_gesture_{clean_gesture}"
+
         with self._get_connection() as conn:
-            conn.execute("""
-                INSERT INTO research_events (
+            conn.execute(f"""
+                CREATE TABLE IF NOT EXISTS {target_table} (
+                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    gesture_name TEXT,
+                    blendshape_value REAL,
+                    cursor_x REAL,
+                    cursor_y REAL,
+                    dwell_time_ms REAL,
+                    voice_text TEXT,
+                    voice_confidence REAL,
+                    voice_success INTEGER,
+                    voice_duration_ms REAL,
+                    FOREIGN KEY (session_id) REFERENCES research_sessions(session_id) ON DELETE CASCADE
+                );
+            """)
+
+            conn.execute(f"""
+                INSERT INTO {target_table} (
                     session_id, timestamp, event_type, gesture_name, blendshape_value,
                     cursor_x, cursor_y, dwell_time_ms, voice_text, voice_confidence,
                     voice_success, voice_duration_ms

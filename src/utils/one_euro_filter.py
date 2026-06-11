@@ -1,20 +1,3 @@
-
-
-"""1 Euro Filter - Adaptive low-pass filter for real-time signal smoothing.
-
-Based on the paper:
-    "1€ Filter: A Simple Speed-based Low-pass Filter for Noisy Input in 
-    Interactive Systems" by Géry Casiez, Nicolas Roussel, Daniel Vogel (2012)
-    https://cristal.univ-lille.fr/~casiez/1euro/
-
-The 1 Euro filter adapts its cutoff frequency based on the speed of the signal:
-  - At low speeds: uses a low cutoff to aggressively smooth jitter
-  - At high speeds: increases cutoff to reduce lag and follow fast movements
-
-This makes it ideal for cursor control via face tracking, where the user needs
-smooth, jitter-free control when still, but responsive tracking when moving.
-"""
-
 import math
 import logging
 import numpy as np
