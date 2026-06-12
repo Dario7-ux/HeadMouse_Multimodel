@@ -650,13 +650,7 @@ class VoiceController(metaclass=Singleton):
         """
         return self.config.get("auto_type", True)
 
-    def requires_confirmation(self) -> bool:
-        """Comprobar si se requiere confirmación antes de escribir.
-        
-        Returns:
-            True si se requiere confirmación, False en caso contrario.
-        """
-        return self.config.get("confirmation_required", False)
+
 
     def should_pause_during_cursor(self) -> bool:
         """Comprobar si la voz debe pausarse durante el movimiento del cursor.

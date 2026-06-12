@@ -91,7 +91,7 @@ class PageVoice(SafeDisposableFrame):
         self.language_var = tkinter.StringVar()
         self.language_menu = customtkinter.CTkComboBox(
             master=self,
-            values=["es-ES", "en-US", "en-GB", "fr-FR"],
+            values=["es-ES"],
             variable=self.language_var,
             command=self._on_language_change)
         self.language_menu.grid(row=3, column=1, padx=20, pady=10, sticky="we")
@@ -162,25 +162,10 @@ class PageVoice(SafeDisposableFrame):
         self.hotword_entry.grid(row=7, column=1, padx=20, pady=10, sticky="ne")
         self.hotword_entry.bind("<KeyRelease>", self._on_hotword_change)
 
-        # Requerir confirmación
-        confirm_label = customtkinter.CTkLabel(
-            master=self,
-            text="Requerir confirmación antes de escribir:")
-        confirm_label.grid(row=8, column=0, padx=20, pady=10, sticky="nw")
-
-        self.confirm_var = tkinter.BooleanVar()
-        self.confirm_switch = customtkinter.CTkSwitch(
-            master=self,
-            variable=self.confirm_var,
-            command=self._on_confirm_change,
-            text=""
-        )
-        self.confirm_switch.grid(row=8, column=1, padx=20, pady=10, sticky="ne")
-
         # Retroalimentación de voz
         feedback_label = customtkinter.CTkLabel(
             master=self, text="Retroalimentación de voz:")
-        feedback_label.grid(row=9, column=0, padx=20, pady=10, sticky="nw")
+        feedback_label.grid(row=8, column=0, padx=20, pady=10, sticky="nw")
 
         self.feedback_var = tkinter.BooleanVar()
         self.feedback_switch = customtkinter.CTkSwitch(
@@ -189,20 +174,20 @@ class PageVoice(SafeDisposableFrame):
             command=self._on_feedback_change,
             text=""
         )
-        self.feedback_switch.grid(row=9, column=1, padx=20, pady=10, sticky="ne")
+        self.feedback_switch.grid(row=8, column=1, padx=20, pady=10, sticky="ne")
 
         # Botón de prueba
         test_btn = customtkinter.CTkButton(
             master=self,
             text="Probar Micrófono",
             command=self._test_microphone)
-        test_btn.grid(row=10, column=0, padx=20, pady=20, sticky="ew", columnspan=2)
+        test_btn.grid(row=9, column=0, padx=20, pady=20, sticky="ew", columnspan=2)
 
         self.test_result_label = customtkinter.CTkLabel(
             master=self, text="", text_color="gray")
-        self.test_result_label.grid(row=11, column=0, padx=20, pady=5, sticky="ew", columnspan=2)
+        self.test_result_label.grid(row=10, column=0, padx=20, pady=5, sticky="ew", columnspan=2)
 
-        self.grid_rowconfigure(12, weight=1)
+        self.grid_rowconfigure(11, weight=1)
 
         self.load_initial_config()
 
@@ -217,7 +202,6 @@ class PageVoice(SafeDisposableFrame):
             self.sensitivity_var.set(config.get("voice_sensitivity", 50))
             self.confidence_var.set(config.get("confidence_threshold", 0.5))
             self.auto_type_var.set(config.get("auto_type", True))
-            self.confirm_var.set(config.get("confirmation_required", False))
             self.feedback_var.set(config.get("voice_feedback", True))
             self.hotword_var.set(config.get("hotword", "focuz"))
 
@@ -295,11 +279,7 @@ class PageVoice(SafeDisposableFrame):
         self.config_manager.update_voice_config({"hotword": val})
         logger.info(f"Hotword changed to: {val}")
 
-    def _on_confirm_change(self):
-        """Maneja el interruptor de requerimiento de confirmación."""
-        self.config_manager.update_voice_config(
-            {"confirmation_required": self.confirm_var.get()})
-        logger.info(f"Confirmation required: {self.confirm_var.get()}")
+
 
     def _on_feedback_change(self):
         """Maneja el interruptor de retroalimentación de voz."""
