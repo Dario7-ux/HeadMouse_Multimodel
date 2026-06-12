@@ -131,6 +131,10 @@ class FrameMenu(SafeDisposableFrame):
         new_state = self.voice_write_var.get()
         ConfigManager().update_voice_config({"auto_type": new_state})
         self.logger.info(f"Voice writing auto-type toggled to {new_state} from sidebar switch")
+        try:
+            self.master_callback("voice_write_toggled")
+        except Exception:
+            pass
 
     def refresh_voice_write_switch(self):
         """Actualiza el estado del interruptor desde la configuración de la BD (p. ej., si se actualiza desde la página de ajustes de Voz)."""

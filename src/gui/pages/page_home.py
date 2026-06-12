@@ -33,12 +33,23 @@ class PageHome(SafeDisposableFrame):
         self.total_keystrokes = 0
         
         from src.utils.database import DatabaseManager
+        import getpass
+        try:
+            computer_user = getpass.getuser()
+            subject_id = computer_user if computer_user else "UsuarioLocal"
+            first_name = computer_user.capitalize() if computer_user else "Usuario"
+            last_name = ""
+        except Exception:
+            subject_id = "UsuarioLocal"
+            first_name = "Usuario"
+            last_name = "Local"
+
         try:
             self.session_id = DatabaseManager().start_research_session(
-                subject_id="UsuarioLocal",
+                subject_id=subject_id,
                 profile_name="Default",
-                subject_first_name="Usuario",
-                subject_last_name="Local"
+                subject_first_name=first_name,
+                subject_last_name=last_name
             )
         except Exception as e:
             import uuid

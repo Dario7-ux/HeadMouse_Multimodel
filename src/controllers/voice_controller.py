@@ -6,6 +6,7 @@ import os
 import pynput.keyboard as keyboard
 import pyaudio
 import pyautogui
+import numpy as np
 
 pyautogui.PAUSE = 0
 pyautogui.FAILSAFE = False
@@ -191,9 +192,49 @@ class VoiceController(metaclass=Singleton):
             # Crear reconocedor
             recognizer = KaldiRecognizer(self.vosk_model, 16000)
             
+            # Variables para el control de la puerta de ruido (Noise Gate)
+            gate_open_chunks = 0
+            # hangover_chunks es el "tiempo de sostenido". A 16000Hz y un buffer de 2048 muestras,
+            # cada bloque dura ~128ms. 4 bloques equivalen a ~512ms de margen para que la puerta
+            # no se cierre abruptamente en medio de una frase o palabra.
+            hangover_chunks = 4
+            
             while self.is_active and self.is_enabled():
                 try:
                     data = self.audio_stream.read(2048, exception_on_overflow=False)
+                    
+                    # CÁLCULO DE AMPLITUD RMS (VOLUMEN):
+                    # Convertimos el buffer binario en un array numérico de tipo int16 (PCM 16 bits).
+                    # Calculamos el valor RMS (Root Mean Square), que mide la potencia/amplitud de la señal.
+                    audio_data = np.frombuffer(data, dtype=np.int16)
+                    rms = np.sqrt(np.mean(audio_data.astype(np.float32)**2))
+                    
+                    # CONTROL DE SENSIBILIDAD E UMBRAL:
+                    # Obtenemos la sensibilidad configurada en el perfil (0 a 100).
+                    sens = self.get_voice_sensitivity()
+                    # Mapeamos la sensibilidad de forma inversa al umbral RMS.
+                    # - Sensibilidad 100 -> Umbral 0 (pasa todo el audio).
+                    # - Sensibilidad 50  -> Umbral 500 (ignora ruidos moderados).
+                    # - Sensibilidad 0   -> Umbral 1000 (muy restrictivo, solo pasa sonidos muy fuertes).
+                    threshold = (100 - sens) * 10
+                    
+                    # DECISIÓN DE LA PUERTA DE RUIDO:
+                    if rms >= threshold:
+                        # Si el volumen captado supera el umbral, consideramos que hay voz activa
+                        # y abrimos/mantenemos abierta la puerta durante el tiempo de sostenido.
+                        gate_open_chunks = hangover_chunks
+                    else:
+                        # Si el volumen es menor al umbral, reducimos el contador de sostenido
+                        # para aproximarnos al cierre de la puerta.
+                        if gate_open_chunks > 0:
+                            gate_open_chunks -= 1
+                    
+                    # FILTRADO DE RUIDO:
+                    # Si el contador de sostenido es 0, significa que no se ha detectado voz reciente.
+                    # Reemplazamos todo el bloque de audio por silencio absoluto (bytes en cero).
+                    # Esto evita que Vosk intente interpretar ruidos de fondo, murmullos o suspiros.
+                    if gate_open_chunks <= 0:
+                        data = b'\x00' * len(data)
                     
                     if recognizer.AcceptWaveform(data):
                         # Resultado final recibido

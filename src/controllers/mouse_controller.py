@@ -27,9 +27,11 @@ DEFAULT_MIN_CUTOFF = 1.0    # Hz - menor = más suavizado cuando está quieto
 DEFAULT_BETA = 0.007        # Coeficiente de velocidad - mayor = menos retardo al moverse
 DEFAULT_D_CUTOFF = 1.0      # Hz - frecuencia de corte del filtro derivativo
 
-
+# Metodo para iniciar el MouseController
 class MouseController(metaclass=Singleton):
-
+    """
+    Controla el movimiento del mouse.
+    """
     def __init__(self):
         logger.info("Intialize MouseController singleton")
         self.prev_x = 0

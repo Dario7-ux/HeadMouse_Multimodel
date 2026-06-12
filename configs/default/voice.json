@@ -5,7 +5,7 @@
     "confidence_threshold": 0.29999999999999993,
     "voice_sensitivity": 41,
     "auto_type": false,
-    "confirmation_required": false,
+    "confirmation_required": true,
     "pause_during_cursor": true,
     "speech_timeout_ms": 5000,
     "voice_feedback": true

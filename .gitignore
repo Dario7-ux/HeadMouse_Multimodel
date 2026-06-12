@@ -1,4 +1,4 @@
-﻿# Python virtual environments
+# Python virtual environments
 .venv/
 venv/
 ENV/
@@ -15,3 +15,9 @@ assets/models/
 # Python caches
 __pycache__/
 *.pyc
+
+# Local runtime logs and database files
+log.txt
+*.db-journal
+*.db-wal
+*.db-shm

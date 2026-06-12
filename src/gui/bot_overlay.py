@@ -25,17 +25,18 @@ class BotOverlay(customtkinter.CTkToplevel):
         except Exception as e:
             logger.warning(f"Could not enable window transparency: {e}")
 
-        # Position the bot in the bottom right corner
+        # Position the bot in the bottom right corner (shifted slightly left)
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         
-        # Initial size (collapsed)
-        self.collapsed_width = 60
-        self.collapsed_height = 60
+        # Initial size (collapsed - slightly larger than 60)
+        self.collapsed_width = 76
+        self.collapsed_height = 76
         self.expanded_width = 440
         self.expanded_height = min(700, screen_height - 80)
         
-        x_pos = screen_width - self.collapsed_width - 20
+        # Positioned 80px to the left from the right edge
+        x_pos = screen_width - self.collapsed_width - 80
         y_pos = screen_height - self.collapsed_height - 60
         self.geometry(f"{self.collapsed_width}x{self.collapsed_height}+{x_pos}+{y_pos}")
         
@@ -49,7 +50,7 @@ class BotOverlay(customtkinter.CTkToplevel):
         self.is_expanded = False
         
         # Container frame (transparent in collapsed state for round window effect)
-        self.main_frame = customtkinter.CTkFrame(self, corner_radius=30, fg_color="transparent")
+        self.main_frame = customtkinter.CTkFrame(self, corner_radius=38, fg_color="transparent")
         self.main_frame.pack(fill="both", expand=True)
         
         # Bot icon using CTkLabel (avoids CustomTkinter's CTkButton dragging block issue)
@@ -58,11 +59,11 @@ class BotOverlay(customtkinter.CTkToplevel):
         self.logo_img = customtkinter.CTkImage(
             light_image=Image.open(get_resource_path("assets/images/boot.png")),
             dark_image=Image.open(get_resource_path("assets/images/boot.png")),
-            size=(54, 54)
+            size=(68, 68)
         )
 
         self.bot_icon_lbl = customtkinter.CTkLabel(
-            self.main_frame, text="", image=self.logo_img, width=60, height=60
+            self.main_frame, text="", image=self.logo_img, width=76, height=76
         )
         self.bot_icon_lbl.place(relx=0.5, rely=0.5, anchor="center")
         
@@ -153,7 +154,7 @@ class BotOverlay(customtkinter.CTkToplevel):
         self.is_expanded = False
         self.content_frame.pack_forget()
         
-        self.main_frame.configure(corner_radius=30, fg_color="transparent")
+        self.main_frame.configure(corner_radius=38, fg_color="transparent")
         
         # Restore the collapsed bot icon label
         self.bot_icon_lbl.place(relx=0.5, rely=0.5, anchor="center")
@@ -162,7 +163,7 @@ class BotOverlay(customtkinter.CTkToplevel):
         screen_height = self.winfo_screenheight()
         
         if not hasattr(self, 'collapsed_x'):
-            self.collapsed_x = screen_width - self.collapsed_width - 20
+            self.collapsed_x = screen_width - self.collapsed_width - 80
             self.collapsed_y = screen_height - self.collapsed_height - 60
             
         new_x = max(10, min(screen_width - self.collapsed_width - 10, self.collapsed_x))

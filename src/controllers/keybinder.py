@@ -22,7 +22,9 @@ pydirectinput.FAILSAFE = False
 
 # pyrefly: ignore [invalid-inheritance]
 class Keybinder(metaclass=Singleton):
-
+    """
+    Controla las pulsaciones de teclas y mouse.
+    """
     def __init__(self) -> None:
         logger.info("Intialize Keybinder singleton")
         self.top_count = 0
@@ -32,6 +34,7 @@ class Keybinder(metaclass=Singleton):
         self.is_started = False
         self.last_know_keybinds = {}
 
+    # Metodo para iniciar el keybinder
     def start(self):
         if not self.is_started:
             logger.info("Start Keybinder singleton")

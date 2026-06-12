@@ -66,7 +66,9 @@ class PageVoice(SafeDisposableFrame):
         self.enable_switch = customtkinter.CTkSwitch(
             master=self,
             variable=self.enable_var,
-            command=self._on_enable_change)
+            command=self._on_enable_change,
+            text=""
+        )
         self.enable_switch.grid(row=1, column=1, padx=20, pady=10, sticky="ne")
 
         # Selección de micrófono
@@ -140,7 +142,9 @@ class PageVoice(SafeDisposableFrame):
         self.auto_type_switch = customtkinter.CTkSwitch(
             master=self,
             variable=self.auto_type_var,
-            command=self._on_auto_type_change)
+            command=self._on_auto_type_change,
+            text=""
+        )
         self.auto_type_switch.grid(row=6, column=1, padx=20, pady=10, sticky="ne")
 
         # Activación por palabra clave (Hotword)
@@ -168,7 +172,9 @@ class PageVoice(SafeDisposableFrame):
         self.confirm_switch = customtkinter.CTkSwitch(
             master=self,
             variable=self.confirm_var,
-            command=self._on_confirm_change)
+            command=self._on_confirm_change,
+            text=""
+        )
         self.confirm_switch.grid(row=8, column=1, padx=20, pady=10, sticky="ne")
 
         # Retroalimentación de voz
@@ -180,7 +186,9 @@ class PageVoice(SafeDisposableFrame):
         self.feedback_switch = customtkinter.CTkSwitch(
             master=self,
             variable=self.feedback_var,
-            command=self._on_feedback_change)
+            command=self._on_feedback_change,
+            text=""
+        )
         self.feedback_switch.grid(row=9, column=1, padx=20, pady=10, sticky="ne")
 
         # Botón de prueba
@@ -275,12 +283,9 @@ class PageVoice(SafeDisposableFrame):
         self.config_manager.update_voice_config(
             {"auto_type": self.auto_type_var.get()})
         logger.info(f"Auto-type: {self.auto_type_var.get()}")
-        # Sincronizar el menú lateral
+        # Sincronizar el menú lateral usando el callback
         try:
-            if hasattr(self.master, "frame_menu"):
-                self.master.frame_menu.refresh_voice_write_switch()
-            elif hasattr(self.master.master, "frame_menu"):
-                self.master.master.frame_menu.refresh_voice_write_switch()
+            self.root_callback("refresh_voice_write")
         except Exception:
             pass
 

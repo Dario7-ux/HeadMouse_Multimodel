@@ -196,6 +196,12 @@ class MainGui():
             except Exception:
                 pass
 
+        elif function_name == "voice_write_toggled":
+            try:
+                self.pages["page_voice"].load_initial_config()
+            except Exception:
+                pass
+
     def cam_preview_callback(self, function_name, args: dict, **kwargs):
         logger.info(f"cam_preview_callback {function_name} with {args}")
 
