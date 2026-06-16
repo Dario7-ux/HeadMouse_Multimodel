@@ -278,6 +278,7 @@ class VoiceController(metaclass=Singleton):
 
         # Comprobar comandos de voz normalizados
         norm_text = text.lower().strip().rstrip(".").rstrip(",")
+        logger.info(f"Voice recognition result: '{text}' (normalized: '{norm_text}')")
 
         # Helpers de deteccion de palabras
         def _has_word(phrase, word):
@@ -292,7 +293,8 @@ class VoiceController(metaclass=Singleton):
 
         # 1. Guardia de DESACTIVACION de escritura (evalua primero para mayor seguridad)
         STOP_WRITE = [
-            "silencio", "no escribir", "dejar de escribir", "deja de escribir",
+            "silencio", "silencia", "silenciar", "pausa", "pausar",
+            "no escribir", "dejar de escribir", "deja de escribir",
             "parar de escribir", "para de escribir", "desactivar escritura",
             "pausar escritura", "detener escritura", "pausa escritura",
             "detener voz", "desactivar voz", "pausar voz",
@@ -383,6 +385,7 @@ class VoiceController(metaclass=Singleton):
         has_left = any(w in words for w in LEFT_WORDS)
 
         if has_clic:
+            logger.info(f"[VOICE COMMAND] Clic command detected: has_double={has_double}, has_left={has_left}")
             if has_double:
                 if has_left:
                     # "doble clic izquierdo"
@@ -419,21 +422,32 @@ class VoiceController(metaclass=Singleton):
                     return
 
         # 5. Comandos para abrir aplicaciones
-        # Analizar verbos de apertura
-        is_open_cmd = any(w in words for w in ["abrir", "abre", "iniciar", "inicia", "abril", "inici", "run", "open"])
+        # Analizar verbos de apertura (ampliado para variantes y sinónimos en español)
+        OPEN_VERBS = [
+            "abrir", "abre", "abran", "ábreme", "abreme", "abrelo", "ábrelo", "abrela", "ábrela",
+            "iniciar", "inicia", "inici", "lanzar", "lanza", "lanzame", "ejecutar", "ejecuta",
+            "ejecutame", "run", "open", "lansa", "lansame", "abril"
+        ]
+        is_open_cmd = any(w in words for w in OPEN_VERBS)
 
         # A. Navegador / Internet
-        is_nav_term = any(w in words for w in ["navegador", "internet", "chrome", "google", "explorador", "web", "browser"])
+        NAV_TERMS = ["navegador", "internet", "chrome", "google", "explorador", "web", "browser", "edge", "firefox", "opera", "safari"]
+        is_nav_term = any(w in words for w in NAV_TERMS)
         
-        # B. Word
-        is_word_term = any(w in words for w in [
-            "word", "uord", "wor", "board", "work", "guor", "por", "words", "works",
+        # B. Word (se remueven términos hiper-comunes 'por' y 'ver' para evitar falsos positivos)
+        WORD_TERMS = [
+            "word", "uord", "wor", "board", "work", "guor", "words", "works",
             "guord", "uort", "wort", "guort", "huor", "huort", "vuor", "vuort", "gor",
-            "gort", "glor", "gual", "guol", "ver", "vor", "bor", "bord", "uard", "guard"
-        ])
+            "gort", "glor", "gual", "guol", "vor", "bor", "bord", "uard", "guard",
+            "winword", "uor", "wors", "world"
+        ]
+        is_word_term = any(w in words for w in WORD_TERMS)
         
         # C. Bloc de notas / Notepad
-        is_notepad_term = any(w in words for w in ["notas", "nota", "notepad", "bloc", "notpad", "blocnotas"])
+        NOTEPAD_TERMS = ["notas", "nota", "notepad", "bloc", "notpad", "blocnotas", "blog", "block", "notapad"]
+        is_notepad_term = any(w in words for w in NOTEPAD_TERMS)
+
+        logger.debug(f"[VOICE COMMAND ENGINE] Match status: is_open_cmd={is_open_cmd}, is_nav_term={is_nav_term}, is_word_term={is_word_term}, is_notepad_term={is_notepad_term}")
 
         if is_open_cmd and is_nav_term:
             import os as _os
@@ -450,10 +464,34 @@ class VoiceController(metaclass=Singleton):
 
         elif is_open_cmd and is_word_term and not is_notepad_term:
             import subprocess as _sp
-            try:
-                _sp.Popen("cmd.exe /c start winword", shell=True, creationflags=_sp.CREATE_NO_WINDOW)
-            except Exception as e:
-                logger.error(f"Error launching Word: {e}")
+            import os as _os
+            word_launched = False
+            possible_word_paths = [
+                r"C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE",
+                r"C:\Program Files (x86)\Microsoft Office\root\Office16\WINWORD.EXE",
+                r"C:\Program Files\Microsoft Office\Office16\WINWORD.EXE",
+                r"C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE",
+                r"C:\Program Files\Microsoft Office\Office15\WINWORD.EXE",
+                r"C:\Program Files (x86)\Microsoft Office\Office15\WINWORD.EXE",
+                r"C:\Program Files\Microsoft Office\Office14\WINWORD.EXE",
+                r"C:\Program Files (x86)\Microsoft Office\Office14\WINWORD.EXE",
+            ]
+            for path in possible_word_paths:
+                if _os.path.exists(path):
+                    try:
+                        logger.info(f"Launching Word from absolute path: {path}")
+                        _sp.Popen([path])
+                        word_launched = True
+                        break
+                    except Exception as e:
+                        logger.warning(f"Failed to launch Word from absolute path {path}: {e}")
+            if not word_launched:
+                try:
+                    logger.info("Launching Word via system registry startup...")
+                    _sp.Popen("cmd.exe /c start winword", shell=True, creationflags=_sp.CREATE_NO_WINDOW)
+                    word_launched = True
+                except Exception as e:
+                    logger.error(f"Error launching Word fallback: {e}")
             self.speak_confirmation("Abriendo Word")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Word]")
@@ -462,10 +500,28 @@ class VoiceController(metaclass=Singleton):
 
         elif is_open_cmd and is_notepad_term:
             import subprocess as _sp
-            try:
-                _sp.Popen("notepad.exe")
-            except Exception as e:
-                logger.error(f"Error launching Notepad: {e}")
+            import os as _os
+            notepad_launched = False
+            possible_notepad_paths = [
+                r"C:\Windows\System32\notepad.exe",
+                r"C:\Windows\notepad.exe"
+            ]
+            for path in possible_notepad_paths:
+                if _os.path.exists(path):
+                    try:
+                        logger.info(f"Launching Notepad from absolute path: {path}")
+                        _sp.Popen([path])
+                        notepad_launched = True
+                        break
+                    except Exception as e:
+                        logger.warning(f"Failed to launch Notepad from absolute path {path}: {e}")
+            if not notepad_launched:
+                try:
+                    logger.info("Launching Notepad via system PATH...")
+                    _sp.Popen("notepad.exe")
+                    notepad_launched = True
+                except Exception as e:
+                    logger.error(f"Error launching Notepad fallback: {e}")
             self.speak_confirmation("Abriendo bloc de notas")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Notas]")

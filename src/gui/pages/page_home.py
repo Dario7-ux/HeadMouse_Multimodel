@@ -107,12 +107,22 @@ class PageHome(SafeDisposableFrame):
         self._wave_canvas = tkinter.Canvas(
             hola_frame, height=60, bg="#161B22", highlightthickness=0
         )
-        self._wave_canvas.grid(row=1, column=0, sticky="ew", padx=20, pady=(6, 20))
+        self._wave_canvas.grid(row=1, column=0, sticky="ew", padx=20, pady=(6, 10))
         self._wave_bars = []
         self._wave_speaking = False
         self._wave_anim_id = None
         # Construir barras al cambiar tamaño
         self._wave_canvas.bind("<Configure>", self._build_wave_bars)
+        
+        # Etiqueta de estado de reconocimiento de voz
+        self._voice_status_lbl = customtkinter.CTkLabel(
+            hola_frame,
+            text="Diga un comando de voz...",
+            text_color=TEXT_SECONDARY,
+            font=customtkinter.CTkFont(family="Google Sans", size=13, weight="normal")
+        )
+        self._voice_status_lbl.grid(row=2, column=0, sticky="ew", padx=20, pady=(0, 15))
+
         # Registrar callback de voz
         try:
             from src.controllers.voice_controller import VoiceController
@@ -120,6 +130,8 @@ class PageHome(SafeDisposableFrame):
             def _voice_wave_cb(text):
                 self._wave_speaking = True
                 self.after(800, lambda: setattr(self, '_wave_speaking', False))
+                # Actualizar texto en tiempo real
+                self.after(0, lambda: self._voice_status_lbl.configure(text=f"Último comando: {text}"))
                 if _orig_cb:
                     try:
                         _orig_cb(text)
