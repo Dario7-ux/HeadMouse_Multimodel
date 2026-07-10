@@ -12,7 +12,7 @@ Esta aplicación ha sido diseñada con altos estándares de accesibilidad para a
 Si no deseas configurar un entorno de desarrollo de Python, puedes descargar el instalador compilado que no requiere privilegios de administrador para facilitar el acceso a cualquier usuario:
 
 1. Descarga el instalador desde la [Sección de Releases](https://github.com/Dario7-ux/HeadMouse_Multimodel/releases).
-2. Ejecuta `Instalador_FocuzVoz_v2.1.exe`.
+2. Ejecuta `Instalador_FocuzVoz_v3.0.exe`.
 3. Sigue los sencillos pasos del asistente. El instalador creará un acceso directo en tu escritorio y ejecutará la aplicación de inmediato al finalizar.
 
 ---
