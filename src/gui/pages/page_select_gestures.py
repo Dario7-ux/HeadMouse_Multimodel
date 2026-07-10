@@ -40,7 +40,7 @@ class FrameSelectGesture(SafeDisposableFrame):
         self.shared_dropdown = Dropdown(
             self,
             dropdown_items=shape_list.available_gestures,
-            width=DIV_WIDTH,
+            width=300,
             callback=self.dropdown_callback)
 
         self.help_icon = customtkinter.CTkImage(
@@ -117,10 +117,11 @@ class FrameSelectGesture(SafeDisposableFrame):
 
             # Combobox
             drop = customtkinter.CTkOptionMenu(master=self,
-                                               values=[gesture_list[0]],
-                                               width=240,
-                                               dynamic_resizing=False,
-                                               state="disabled")
+                                                values=[gesture_list[0]],
+                                                width=260,
+                                                dynamic_resizing=False,
+                                                state="disabled",
+                                                text_color_disabled=("#000000", "#FFFFFF"))
             drop.grid(row=row,
                       column=column,
                       padx=(20, 20),

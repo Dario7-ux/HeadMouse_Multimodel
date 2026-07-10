@@ -61,6 +61,7 @@ available_actions = {
     "Clic izquierdo del ratón": ["mouse", "left"],
     "Clic derecho del ratón": ["mouse", "right"],
     "Clic central del ratón": ["mouse", "middle"],
+    "Doble clic izquierdo del ratón": ["mouse", "double_left"],
     "Pausar / Reanudar ratón": ["mouse", "pause"],
     "Restablecer cursor al centro": ["mouse", "reset"],
     "Cambiar entre monitores": ["mouse", "cycle"]
@@ -78,6 +79,7 @@ available_gestures = {
     "Lower left eyebrow": "assets/images/dropdowns/Lower left eyebrow.png",
     "Raise right eyebrow": "assets/images/dropdowns/Raise right eyebrow.png",
     "Lower right eyebrow": "assets/images/dropdowns/Lower right eyebrow.png",
+    "cheekPuff": "assets/images/dropdowns/cheekPuff.png",
 }
 gesture_translation_map = {
     "None": "Ninguno",
@@ -88,7 +90,8 @@ gesture_translation_map = {
     "Raise left eyebrow": "Levantar ceja izquierda",
     "Lower left eyebrow": "Bajar ceja izquierda",
     "Raise right eyebrow": "Levantar ceja derecha",
-    "Lower right eyebrow": "Bajar ceja derecha"
+    "Lower right eyebrow": "Bajar ceja derecha",
+    "cheekPuff": "Inflar mejillas"
 }
 for k, v in available_gestures.items():
     assert k in blendshape_names, f"{k} not in blendshape_names"

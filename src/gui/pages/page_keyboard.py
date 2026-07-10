@@ -24,7 +24,7 @@ YELLOW = "#FABB05"
 LIGHT_BLUE = "#FBFBFF"
 BLUE = "#1A73E8"
 PAD_X = 40
-DIV_WIDTH = 240
+DIV_WIDTH = 260
 HELP_ICON_SIZE = (18, 18)
 A_BUTTON_SIZE = (96, 48)
 BIN_ICON_SIZE = (24, 24)
@@ -51,7 +51,7 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
         self.shared_dropdown = Dropdown(
             self,
             dropdown_items=shape_list.available_gestures,
-            width=DIV_WIDTH,
+            width=300,
             callback=self.dropdown_callback)
 
         self.help_icon = customtkinter.CTkImage(
@@ -206,7 +206,8 @@ class FrameSelectKeyboard(SafeDisposableScrollableFrame):
                                            values=[gesture_name],
                                            width=DIV_WIDTH,
                                            dynamic_resizing=False,
-                                           state="disabled")
+                                           state="disabled",
+                                           text_color_disabled=("#000000", "#FFFFFF"))
         drop.grid(row=row, column=0, padx=PAD_X, pady=(64, 10), sticky="nw")
         self.shared_dropdown.register_widget(drop, div_name)
 

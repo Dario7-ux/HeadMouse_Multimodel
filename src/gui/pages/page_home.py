@@ -380,6 +380,7 @@ class PageHome(SafeDisposableFrame):
                 "left":  "Clic izquierdo 🖱️",
                 "right": "Clic derecho 🖱️",
                 "middle": "Clic central 🖱️",
+                "double_left": "Doble clic izquierdo 🖱️",
                 "pause": "Pausar/Reanudar ⏸️",
                 "reset": "Centrar cursor 🎯",
                 "scroll_up": "Scroll arriba ↑",

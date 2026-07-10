@@ -105,8 +105,49 @@ class FaceMesh(metaclass=Singleton):
                                               shift=-1,
                                               axis=0)
 
-            self.blendshapes_buffer[-1] = np.array(
-                [b.score for b in mp_result.face_blendshapes[0]])
+            raw_blendshapes = [b.score for b in mp_result.face_blendshapes[0]]
+            
+            # Calcular cheekPuff personalizado geométricamente
+            try:
+                def get_pt(idx):
+                    l = self.mp_landmarks[idx]
+                    return np.array([l.x, l.y, l.z])
+                
+                p_left_eye = get_pt(33)
+                p_right_eye = get_pt(263)
+                d_eye = np.linalg.norm(p_left_eye - p_right_eye)
+                
+                p_lc1 = get_pt(117)
+                p_l_mouth = get_pt(61)
+                p_rc1 = get_pt(346)
+                p_r_mouth = get_pt(291)
+                
+                dist_l1 = np.linalg.norm(p_lc1 - p_l_mouth) / d_eye
+                dist_r1 = np.linalg.norm(p_rc1 - p_r_mouth) / d_eye
+                
+                sum_dist = dist_l1 + dist_r1
+                
+                # Calibración dinámica del estado de reposo usando el percentil 10 de un historial de 90 frames
+                if not hasattr(self, "cheek_history"):
+                    self.cheek_history = []
+                
+                self.cheek_history.append(sum_dist)
+                if len(self.cheek_history) > 90:
+                    self.cheek_history.pop(0)
+                
+                # Usar el percentil 10 para ignorar ruidos de parpadeo, inicio o pérdida de tracking
+                cheek_base = np.percentile(self.cheek_history, 10)
+                
+                # Mapear la diferencia con respecto a la base (rango de 0.08 de amplitud)
+                simulated_score = (sum_dist - cheek_base) / 0.08
+                simulated_score = max(0.0, min(1.0, simulated_score))
+                
+                # Sobrescribir cheekPuff (índice 6)
+                raw_blendshapes[6] = float(simulated_score)
+            except Exception as e:
+                logger.error(f"Error calculating custom cheekPuff: {e}")
+
+            self.blendshapes_buffer[-1] = np.array(raw_blendshapes)
             self.smooth_blendshapes = utils.apply_smoothing(
                 self.blendshapes_buffer, self.smooth_kernel)
 

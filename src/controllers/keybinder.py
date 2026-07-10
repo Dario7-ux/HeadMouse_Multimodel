@@ -90,24 +90,29 @@ class Keybinder(metaclass=Singleton):
 
     def mouse_action(self, is_triggered, is_stable_active, action, mode, shape_name=None) -> None:
         state_name = "mouse_" + action
+        button_arg = "left" if action == "double_left" else action
 
         if mode == "hold":
             if is_stable_active and (self.key_states[state_name] is False):
-                pydirectinput.mouseDown(button=action)
+                pydirectinput.mouseDown(button=button_arg)
                 self.key_states[state_name] = True
                 
                 # Notificar a la sesión de investigación (si está activa)
                 self._log_research_event("click_hold_start", shape_name or action)
                 
             elif (not is_stable_active) and (self.key_states[state_name] is True):
-                pydirectinput.mouseUp(button=action)
+                pydirectinput.mouseUp(button=button_arg)
                 self.key_states[state_name] = False
                 
                 self._log_research_event("click_hold_end", shape_name or action)
 
         elif mode == "single":
             if is_triggered:
-                pydirectinput.click(button=action)
+                if action == "double_left":
+                    import pyautogui
+                    pyautogui.doubleClick()
+                else:
+                    pydirectinput.click(button=action)
                 self.start_hold_ts = time.time()
                 self.key_states[state_name] = True
                 
@@ -117,14 +122,14 @@ class Keybinder(metaclass=Singleton):
                 if not self.holding and (
                     ((time.time() - self.start_hold_ts) * 1000) >=
                         ConfigManager().config["hold_trigger_ms"]):
-                    pydirectinput.mouseDown(button=action)
+                    pydirectinput.mouseDown(button=button_arg)
                     self.holding = True
 
             elif (not is_stable_active) and (self.key_states[state_name] is True):
                 self.key_states[state_name] = False
 
                 if self.holding:
-                    pydirectinput.mouseUp(button=action)
+                    pydirectinput.mouseUp(button=button_arg)
                     self.holding = False
                     self.start_hold_ts = math.inf
 

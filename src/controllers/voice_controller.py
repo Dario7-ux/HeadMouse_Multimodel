@@ -291,6 +291,28 @@ class VoiceController(metaclass=Singleton):
         def _has_any_substr(phrase, substrs):
             return any(s in phrase for s in substrs)
 
+        # Funcion auxiliar para registrar telemetria
+        def log_custom_event(event_type, action, extra_voice_text=None, is_click=False, click_count=1):
+            try:
+                from src.gui.pages.page_home import PageHome
+                home_page = PageHome.get_instance()
+                if home_page and home_page.is_recording:
+                    x, y = pyautogui.position()
+                    DatabaseManager().log_research_event(
+                        session_id=home_page.session_id,
+                        event_type=event_type,
+                        gesture_name=action,
+                        cursor_x=x,
+                        cursor_y=y,
+                        voice_text=extra_voice_text
+                    )
+                    if is_click:
+                        home_page.total_clicks += click_count
+                    else:
+                        home_page.total_voice_commands += 1
+            except Exception as e:
+                logger.error(f"Error al registrar la telemetria de voz: {e}")
+
         # 1. Guardia de DESACTIVACION de escritura (evalua primero para mayor seguridad)
         STOP_WRITE = [
             "silencio", "silencia", "silenciar", "pausa", "pausar",
@@ -339,44 +361,75 @@ class VoiceController(metaclass=Singleton):
                     pass
             return
 
-        # 3. Comandos de control de sesion
+        # 3. Comandos de control de cursor (Mover / Quieto)
+        START_CURSOR_SUBSTRS = ["activar cursor", "cursor on"]
+        STOP_CURSOR_SUBSTRS = ["desactivar cursor", "cursor off", "detener cursor", "pausar cursor"]
+        if _has_any_substr(norm_text, START_CURSOR_SUBSTRS) or _has_word(norm_text, "mover"):
+            from src.controllers import MouseController
+            MouseController().set_active(True)
+            self.speak_confirmation("Control de cursor activado")
+            if self._ui_callback:
+                self._ui_callback("[Comando: Cursor activado]")
+            log_custom_event(event_type="voice_command", action="cursor_on", extra_voice_text="activar cursor")
+            return
+
+        if _has_any_substr(norm_text, STOP_CURSOR_SUBSTRS) or _has_word(norm_text, "quieto"):
+            from src.controllers import MouseController
+            MouseController().set_active(False)
+            self.speak_confirmation("Control de cursor desactivado")
+            if self._ui_callback:
+                self._ui_callback("[Comando: Cursor desactivado]")
+            log_custom_event(event_type="voice_command", action="cursor_off", extra_voice_text="desactivar cursor")
+            return
+
+        # 4. Comandos de control de sesion
         words = norm_text.split()
         is_focuz_brand = any(w in words for w in ["focuz", "focus", "focu", "focuvoz", "focusvoz"])
 
-        if is_focuz_brand and any(w in words for w in ["finish", "finis", "finsh", "fini", "fin", "cerrar", "cierra", "exit", "finalizar"]):
-            from src.gui.pages.page_home import PageHome
-            home = PageHome.get_instance()
-            if home:
-                self.speak_confirmation("Cerrando aplicacion")
-                if self._ui_callback:
-                    self._ui_callback("[Comando: Cerrando aplicacion]")
-                home.after(100, lambda: home.root_callback("close_app") if home.root_callback else None)
-            return
-
-        # Funcion auxiliar para registrar telemetria
-        def log_custom_event(event_type, action, extra_voice_text=None, is_click=False, click_count=1):
-            try:
+        if is_focuz_brand:
+            if any(w in words for w in ["finish", "finis", "finsh", "fini", "fin", "cerrar", "cierra", "exit", "finalizar"]):
                 from src.gui.pages.page_home import PageHome
-                home_page = PageHome.get_instance()
-                if home_page and home_page.is_recording:
-                    x, y = pyautogui.position()
-                    DatabaseManager().log_research_event(
-                        session_id=home_page.session_id,
-                        event_type=event_type,
-                        gesture_name=action,
-                        cursor_x=x,
-                        cursor_y=y,
-                        voice_text=extra_voice_text
-                    )
-                    if is_click:
-                        home_page.total_clicks += click_count
-                    else:
-                        home_page.total_voice_commands += 1
-            except Exception as e:
-                logger.error(f"Error al registrar la telemetria de voz: {e}")
+                home = PageHome.get_instance()
+                if home:
+                    self.speak_confirmation("Cerrando aplicacion")
+                    if self._ui_callback:
+                        self._ui_callback("[Comando: Cerrando aplicacion]")
+                    home.after(100, lambda: home.root_callback("close_app") if home.root_callback else None)
+                return
 
-        # 4. Comandos de CLICS con variantes fonéticas que Vosk en español puede producir
-        CLIC_WORDS = ["clic", "click", "cli", "klik", "clik", "clique", "klick", "klic", "klique"]
+            if any(w in words for w in ["go", "start", "iniciar", "inicia", "comenzar"]):
+                from src.gui.pages.page_home import PageHome
+                home = PageHome.get_instance()
+                if home:
+                    if home.session_id is None:
+                        try:
+                            import getpass
+                            computer_user = getpass.getuser()
+                            subject_id = computer_user if computer_user else "UsuarioLocal"
+                            first_name = computer_user.capitalize() if computer_user else "Usuario"
+                            home.session_id = DatabaseManager().start_research_session(
+                                subject_id=subject_id,
+                                profile_name="Default",
+                                subject_first_name=first_name,
+                                subject_last_name=""
+                            )
+                            home.is_recording = True
+                            home.total_clicks = 0
+                            home.total_voice_commands = 0
+                            home.total_keystrokes = 0
+                            self.speak_confirmation("Sesión iniciada")
+                            if self._ui_callback:
+                                self._ui_callback("[Comando: Sesión iniciada]")
+                        except Exception as e:
+                            logger.error(f"Error starting session via voice: {e}")
+                    else:
+                        self.speak_confirmation("Sesión ya está activa")
+                        if self._ui_callback:
+                            self._ui_callback("[Sesión ya activa]")
+                return
+
+        # 5. Comandos de CLICS con variantes fonéticas que Vosk en español puede producir
+        CLIC_WORDS = ["clic", "click", "cli", "klik", "clik", "clique", "klick", "klic", "klique", "tic", "tick", "tique", "tics", "ticks"]
         LEFT_WORDS = ["izquierdo", "izquierda", "izquiedo", "izquiero", "izquerda"]
         DOUBLE_WORDS = ["doble", "dobles", "dobl"]
 
@@ -536,7 +589,7 @@ class VoiceController(metaclass=Singleton):
             cmd_text = norm_text.strip().rstrip(".").rstrip(",")
 
             # Borrar todo el texto
-            if cmd_text in ["borrar todo", "eliminar todo", "limpiar todo", "limpiar"]:
+            if cmd_text in ["borrar todo", "eliminar todo", "limpiar todo", "limpiar", "borra todo", "elimina todo", "limpiar el texto", "borrar todo el texto"]:
                 logger.info("[VOICE COMMAND] Clear all text triggered!")
                 try:
                     with self.keyboard_controller.pressed(keyboard.Key.ctrl):
@@ -554,7 +607,7 @@ class VoiceController(metaclass=Singleton):
                 return
 
             # Borrar ultimo segmento escrito
-            elif cmd_text in ["borrar", "eliminar", "corregir", "deshacer"]:
+            elif cmd_text in ["borrar", "eliminar", "corregir", "deshacer", "borra", "elimina", "deshaz"]:
                 logger.info("[VOICE COMMAND] Delete last typed segment triggered!")
                 last_len = getattr(self, "last_typed_len", 0)
                 if last_len > 0:

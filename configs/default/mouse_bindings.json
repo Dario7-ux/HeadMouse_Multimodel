@@ -1,26 +1,38 @@
 {
+    "Lower right eyebrow": [
+        "mouse", 
+        "reset", 
+        0.06939999999999998, 
+        "single"
+    ], 
+    "Mouth left": [
+        "mouse", 
+        "left", 
+        0.3961, 
+        "single"
+    ], 
     "Mouth right": [
         "mouse", 
-        "middle", 
-        0.505, 
+        "right", 
+        0.2278, 
         "single"
     ], 
     "Open mouth": [
         "mouse", 
-        "pause", 
-        0.15849999999999995, 
+        "middle", 
+        0.2872, 
         "single"
     ], 
     "Raise left eyebrow": [
         "mouse", 
-        "left", 
-        0.5446, 
+        "pause", 
+        0.4654, 
         "single"
     ], 
     "Roll lower mouth": [
         "mouse", 
-        "reset", 
-        0.039699999999999985, 
+        "double_left", 
+        0.35650000000000004, 
         "single"
     ]
 }
