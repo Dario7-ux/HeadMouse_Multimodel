@@ -80,9 +80,10 @@ class Dropdown():
     def create_divs(self, master, ges_images: dict, width: int) -> dict:
         import src.shape_list as shape_list
         import os
+        from src.utils.resource_helper import get_resource_path
         divs = {}
         for row, (gesture, image_path) in enumerate(ges_images.items()):
-            if not os.path.exists(image_path):
+            if not os.path.exists(get_resource_path(image_path)):
                 image_path = "assets/images/dropdowns/None.png"
             image = customtkinter.CTkImage(
                 Image.open(image_path).resize(ICON_SIZE), size=ICON_SIZE)

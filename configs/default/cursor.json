@@ -5,7 +5,7 @@
     "tracking_vert_idxs": [
         1
     ], 
-    "spd_up": 18.0, 
+    "spd_up": 64, 
     "spd_down": 22.0, 
     "spd_left": 18.0, 
     "spd_right": 18.0, 

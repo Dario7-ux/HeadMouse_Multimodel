@@ -28,7 +28,29 @@ logger = logging.getLogger("VoiceController")
 
 # Ruta del modelo de Vosk
 VOSK_MODEL_PATH = get_resource_path("assets/models/vosk-model-es-0.42")
+class TempResetDLLDirectory:
+    """Context manager to temporarily reset the DLL search directory on Windows.
+    This prevents child processes from inheriting PyInstaller's internal search path
+    and failing due to DLL conflicts.
+    """
+    def __enter__(self):
+        import sys
+        self.meipass = getattr(sys, '_MEIPASS', None)
+        if self.meipass:
+            try:
+                import ctypes
+                ctypes.windll.kernel32.SetDllDirectoryW(None)
+            except Exception:
+                pass
+        return self
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.meipass:
+            try:
+                import ctypes
+                ctypes.windll.kernel32.SetDllDirectoryW(self.meipass)
+            except Exception:
+                pass
 
 
 # pyrefly: ignore [invalid-inheritance]
@@ -384,18 +406,24 @@ class VoiceController(metaclass=Singleton):
 
         # 4. Comandos de control de sesion
         words = norm_text.split()
-        is_focuz_brand = any(w in words for w in ["focuz", "focus", "focu", "focuvoz", "focusvoz"])
+        is_focuz_brand = any(w in words for w in ["focuz", "focus", "focu", "focuvoz", "focusvoz", "focuzvoz"])
 
-        if is_focuz_brand:
-            if any(w in words for w in ["finish", "finis", "finsh", "fini", "fin", "cerrar", "cierra", "exit", "finalizar"]):
-                from src.gui.pages.page_home import PageHome
-                home = PageHome.get_instance()
-                if home:
-                    self.speak_confirmation("Cerrando aplicacion")
-                    if self._ui_callback:
-                        self._ui_callback("[Comando: Cerrando aplicacion]")
-                    home.after(100, lambda: home.root_callback("close_app") if home.root_callback else None)
-                return
+        # Check if the user explicitly wants to close the program
+        is_close_cmd = False
+        if is_focuz_brand and any(w in words for w in ["finish", "finis", "finsh", "fini", "fin", "cerrar", "cierra", "exit", "finalizar"]):
+            is_close_cmd = True
+        elif any(w in words for w in ["cerrar", "cierra", "salir", "finalizar"]) and any(w in words for w in ["programa", "aplicacion", "aplicación"]):
+            is_close_cmd = True
+
+        if is_close_cmd:
+            from src.gui.pages.page_home import PageHome
+            home = PageHome.get_instance()
+            if home:
+                self.speak_confirmation("Cerrando aplicacion")
+                if self._ui_callback:
+                    self._ui_callback("[Comando: Cerrando aplicacion]")
+                home.after(100, lambda: home.root_callback("close_app") if home.root_callback else None)
+            return
 
             if any(w in words for w in ["go", "start", "iniciar", "inicia", "comenzar"]):
                 from src.gui.pages.page_home import PageHome
@@ -504,11 +532,12 @@ class VoiceController(metaclass=Singleton):
 
         if is_open_cmd and is_nav_term:
             import os as _os
-            try:
-                _os.startfile("https://www.google.com")
-            except Exception:
-                import webbrowser
-                webbrowser.open("https://www.google.com")
+            with TempResetDLLDirectory():
+                try:
+                    _os.startfile("https://www.google.com")
+                except Exception:
+                    import webbrowser
+                    webbrowser.open("https://www.google.com")
             self.speak_confirmation("Abriendo navegador")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Navegador]")
@@ -516,7 +545,6 @@ class VoiceController(metaclass=Singleton):
             return
 
         elif is_open_cmd and is_word_term and not is_notepad_term:
-            import subprocess as _sp
             import os as _os
             word_launched = False
             possible_word_paths = [
@@ -529,22 +557,29 @@ class VoiceController(metaclass=Singleton):
                 r"C:\Program Files\Microsoft Office\Office14\WINWORD.EXE",
                 r"C:\Program Files (x86)\Microsoft Office\Office14\WINWORD.EXE",
             ]
-            for path in possible_word_paths:
-                if _os.path.exists(path):
+            with TempResetDLLDirectory():
+                for path in possible_word_paths:
+                    if _os.path.exists(path):
+                        try:
+                            logger.info(f"Launching Word from absolute path: {path}")
+                            _os.startfile(path)
+                            word_launched = True
+                            break
+                        except Exception as e:
+                            logger.warning(f"Failed to launch Word from absolute path {path}: {e}")
+                if not word_launched:
                     try:
-                        logger.info(f"Launching Word from absolute path: {path}")
-                        _sp.Popen([path])
+                        logger.info("Launching Word via os.startfile shortcut...")
+                        _os.startfile("winword.exe")
                         word_launched = True
-                        break
                     except Exception as e:
-                        logger.warning(f"Failed to launch Word from absolute path {path}: {e}")
-            if not word_launched:
-                try:
-                    logger.info("Launching Word via system registry startup...")
-                    _sp.Popen("cmd.exe /c start winword", shell=True, creationflags=_sp.CREATE_NO_WINDOW)
-                    word_launched = True
-                except Exception as e:
-                    logger.error(f"Error launching Word fallback: {e}")
+                        logger.warning(f"Failed to launch Word via startfile winword.exe: {e}")
+                        try:
+                            logger.info("Launching Word via system registry startup...")
+                            _os.system("start winword")
+                            word_launched = True
+                        except Exception as ex:
+                            logger.error(f"Error launching Word fallback: {ex}")
             self.speak_confirmation("Abriendo Word")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Word]")
@@ -552,29 +587,35 @@ class VoiceController(metaclass=Singleton):
             return
 
         elif is_open_cmd and is_notepad_term:
-            import subprocess as _sp
             import os as _os
             notepad_launched = False
             possible_notepad_paths = [
                 r"C:\Windows\System32\notepad.exe",
                 r"C:\Windows\notepad.exe"
             ]
-            for path in possible_notepad_paths:
-                if _os.path.exists(path):
+            with TempResetDLLDirectory():
+                for path in possible_notepad_paths:
+                    if _os.path.exists(path):
+                        try:
+                            logger.info(f"Launching Notepad from absolute path: {path}")
+                            _os.startfile(path)
+                            notepad_launched = True
+                            break
+                        except Exception as e:
+                            logger.warning(f"Failed to launch Notepad from absolute path {path}: {e}")
+                if not notepad_launched:
                     try:
-                        logger.info(f"Launching Notepad from absolute path: {path}")
-                        _sp.Popen([path])
+                        logger.info("Launching Notepad via os.startfile...")
+                        _os.startfile("notepad.exe")
                         notepad_launched = True
-                        break
                     except Exception as e:
-                        logger.warning(f"Failed to launch Notepad from absolute path {path}: {e}")
-            if not notepad_launched:
-                try:
-                    logger.info("Launching Notepad via system PATH...")
-                    _sp.Popen("notepad.exe")
-                    notepad_launched = True
-                except Exception as e:
-                    logger.error(f"Error launching Notepad fallback: {e}")
+                        logger.warning(f"Failed to launch Notepad via startfile: {e}")
+                        try:
+                            logger.info("Launching Notepad via system PATH...")
+                            _os.system("start notepad")
+                            notepad_launched = True
+                        except Exception as ex:
+                            logger.error(f"Error launching Notepad fallback: {ex}")
             self.speak_confirmation("Abriendo bloc de notas")
             if self._ui_callback:
                 self._ui_callback("[Comando: Abrir Notas]")
@@ -590,11 +631,17 @@ class VoiceController(metaclass=Singleton):
 
             # Borrar todo el texto
             if cmd_text in ["borrar todo", "eliminar todo", "limpiar todo", "limpiar", "borra todo", "elimina todo", "limpiar el texto", "borrar todo el texto"]:
-                logger.info("[VOICE COMMAND] Clear all text triggered!")
+                logger.info("[VOICE COMMAND] Clear current paragraph/line triggered!")
                 try:
-                    with self.keyboard_controller.pressed(keyboard.Key.ctrl):
-                        self.keyboard_controller.press("a")
-                        self.keyboard_controller.release("a")
+                    # Seleccionar hacia arriba para abarcar el párrafo
+                    with self.keyboard_controller.pressed(keyboard.Key.ctrl, keyboard.Key.shift):
+                        self.keyboard_controller.press(keyboard.Key.up)
+                        self.keyboard_controller.release(keyboard.Key.up)
+                    # Seleccionar hasta el inicio de la línea (para inputs de una sola línea)
+                    with self.keyboard_controller.pressed(keyboard.Key.shift):
+                        self.keyboard_controller.press(keyboard.Key.home)
+                        self.keyboard_controller.release(keyboard.Key.home)
+                    # Borrar la selección
                     self.keyboard_controller.press(keyboard.Key.backspace)
                     self.keyboard_controller.release(keyboard.Key.backspace)
                 except Exception as e:
